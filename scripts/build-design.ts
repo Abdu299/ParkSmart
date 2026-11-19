@@ -9,7 +9,7 @@ if (!parking) throw new Error('Missing reference dataset');
 html = html.replace(parking[0], '<script>const PARKING_DATA='+JSON.stringify(designData(dataset)).replace(/</g,'\\u003c')+';</script>');
 html = html.replace("const DATA_DATE='03.11.2026';", "const DATA_DATE="+JSON.stringify(dataset.fetchedAt.slice(0,10))+';');
 html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, loginPage('profile','Min profil','Logg inn for å se profilen din','Dine parkeringer, kjøretøy og favoritter samles her.'));
-html = html.replace(/<section id="ai"[\s\S]*?<\/section>/,loginPage('ai','✦ ParkSmart AI','Logg inn for AI-søk','Din parkeringsassistent kommer her.'));
+html = html.replace(/<section id="ai"[\s\S]*?<\/section>/, aiPage());
 // Keep one shared navigation bar as a sibling of every screen.
 html = html.replace(/<div class="nav" data-nav="[^"]+"><\/div>/g, '');
 const phoneEnd = /(<\/section>\s*)<\/div>(?=<script>)/;
@@ -32,12 +32,13 @@ html = html.replace('<div id="addressStatus"', '<div class="parking-controls"><l
 html = html.replace('<button class="pill" data-filter="Parkeringshus"', '<button class="pill" data-filter="Betaling" onclick="filter(this)">Betaling</button><button class="pill" data-filter="HC" onclick="filter(this)">HC</button><button class="pill" data-filter="Lading" onclick="filter(this)">Lading</button><button class="pill" data-filter="Parkeringshus"');
 html = html.replace(/<details class="parking-sources">[\s\S]*?<\/details>/, '<details class="parking-sources"><summary>Kartdata og vilkår · '+dataset.fetchedAt.slice(0,10)+'</summary><p>Oslo kommune og Statens vegvesen. Kartbakgrunn: Kartverket. Markører viser steder og strekninger, ikke ledighet. HC/lading kan vise egenskaper ved hele områder. Næradresser er omtrentlige. Skiltingen på stedet gjelder.</p><p>Avgiftsfrie plasser i registeret bekrefter ikke fri tilgang. Prisavvik gir ukjent tidsstatus. <button class="pill" onclick="refreshAppData()">Oppdater data</button></p></details>');
 html = html.replace(/(<button class="feature" onclick=")go\('find'\)("><span class="symbol">🔎)/, "$1go('ai')$2");
-const css = '<style>'+await readFile('src/design/app.css','utf8')+'</style>';
+const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
 const bridge = await readFile('src/design/bridge.js','utf8');
 const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
 const theme = await readFile('src/design/theme.js','utf8');
+const ai = await readFile('src/design/ai.js','utf8');
 // Keep navigation working with both the previous and updated bridge.js.
 const navigationBridge = `
 function syncAppNavigation() {
@@ -80,13 +81,40 @@ if (parkingSheetForListButton) {
 syncParkingListButton();
 go('home');
 `;
-html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'</script></body>');
+html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+ai+'</script></body>');
 await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
 function loginPage(id:string,title:string,heading:string,description:string) {
  return `<section id="${id}" class="screen"><div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>${title}</h2></div><div class="scroll login-required"><div class="profileavatar" aria-hidden="true">${navIcon(id)}</div><h2>${heading}</h2><p class="muted">${description}</p><button class="btn" style="margin-top:28px" onclick="alert('Innlogging kommer i en senere versjon.')">Logg inn</button><button class="pill" style="margin-top:12px" onclick="go('find')">Fortsett uten innlogging</button></div></section>`;
+}
+function aiPage() {
+ return `<section id="ai" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button><span>✦ ParkSmart AI</span></h2></div>
+  <div class="ai-page">
+   <div id="aiMessages" class="ai-messages" role="log" aria-live="polite" aria-label="Samtale med ParkSmart AI">
+    <div class="ai-message ai-message-assistant"><div class="ai-avatar" aria-hidden="true">✦</div><div class="ai-bubble"><strong>Hei! Hva kan jeg hjelpe deg med?</strong><p>Spør om parkering i Oslo, finn en plass i nærheten eller ta bilde av et parkeringsskilt.</p></div></div>
+   </div>
+   <div id="aiSuggestions" class="ai-suggestions" aria-label="Forslag">
+    <button type="button" onclick="askAiSuggestion('Hvor er nærmeste gratis parkering?')">Nærmeste gratis</button>
+    <button type="button" onclick="askAiSuggestion('Finn nærmeste MC-parkering')">MC-parkering</button>
+    <button type="button" onclick="askAiSuggestion('Finn parkering med lading i nærheten')">Lading</button>
+    <button type="button" onclick="pickAiPhoto(true)">📷 Tolk et skilt</button>
+   </div>
+   <div id="aiPhoto" class="ai-photo" hidden>
+    <img id="aiPhotoImage" alt="Valgt parkeringsskilt">
+    <div><strong>Bilde klart</strong><small>Send et spørsmål for å analysere skiltet.</small></div>
+    <button type="button" onclick="removeAiPhoto()" aria-label="Fjern bildet">×</button>
+   </div>
+   <form class="ai-composer" onsubmit="submitAiQuestion(event)">
+    <button class="ai-camera" type="button" onclick="pickAiPhoto(true)" aria-label="Ta bilde av skilt">📷</button>
+    <textarea id="aiInput" rows="1" maxlength="500" placeholder="Spør om parkering …" aria-label="Spør ParkSmart AI"></textarea>
+    <button id="aiSend" class="ai-send" type="submit" aria-label="Send spørsmål">➤</button>
+   </form>
+   <p class="ai-disclaimer">Kontroller alltid skiltene på stedet. Midlertidig skilting kan overstyre informasjonen i appen.</p>
+  </div>
+ </section>`;
 }
 function navIcon(id: string) {
  const paths: Record<string, string> = {

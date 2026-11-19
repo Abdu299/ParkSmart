@@ -40,17 +40,22 @@
     "undici": "^8.12.4"
   },
   "scripts": {
+    "prestart": "npm run design:build",
     "start": "expo start",
+    "preandroid": "npm run design:build",
     "android": "expo start --android",
+    "preios": "npm run design:build",
     "ios": "expo start --ios",
+    "preweb": "npm run design:build",
     "web": "expo start --web",
     "start:tunnel": "expo start --tunnel",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
+    "pretest": "npm run design:build",
     "test": "node --import tsx --test tests/*.test.ts",
     "data:refresh": "node --import tsx scripts/update-data.ts && npm run design:build",
     "data:quick": "node --import tsx scripts/update-data.ts --quick && npm run design:build",
-    "check": "npm run typecheck && npm run lint && npm test",
+    "check": "npm run design:build && npm run typecheck && npm run lint && npm test",
     "design:build": "node --import tsx scripts/build-design.ts"
   },
   "private": true
