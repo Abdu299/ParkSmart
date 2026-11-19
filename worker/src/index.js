@@ -110,7 +110,7 @@ async function requestGemini(env, model, payload) {
         'Api-Revision': '2026-05-20'
       },
       body: JSON.stringify({ ...payload, model }),
-      signal: AbortSignal.timeout(14000)
+      signal: AbortSignal.timeout(7000)
     });
     const body = await response.json().catch(() => ({}));
     return { response, body };
@@ -125,11 +125,11 @@ async function requestGemini(env, model, payload) {
 async function requestWithFallback(env, payload) {
   const primary = env.GEMINI_MODEL || 'gemini-3.8-flash';
   const fallback = env.GEMINI_FALLBACK_MODEL || 'gemini-3.6-flash';
-  const models = [primary, primary, fallback];
+  const models = [primary, fallback];
   let lastResult;
 
   for (let index = 0; index < models.length; index += 1) {
-    if (index === 1) await wait(450);
+    if (index === 1) await wait(250);
     lastResult = await requestGemini(env, models[index], payload);
     if (lastResult.response.ok || !RETRYABLE_STATUSES.has(lastResult.response.status)) return lastResult;
   }

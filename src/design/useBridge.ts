@@ -63,7 +63,7 @@ export function useDesignBridge(send: (packet: unknown) => void) {
       if(!AI_ENDPOINT){send({type:'aiError',requestId,message:'AI er ikke konfigurert ennå. Legg EXPO_PUBLIC_PARKSMART_AI_URL i .env og start Expo på nytt.'});return;}
       if(typeof packet.question!=='string'||packet.question.trim().length===0){send({type:'aiError',requestId,message:'Skriv et spørsmål først.'});return;}
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),50000);
+      const timeout=setTimeout(()=>controller.abort(),18000);
       try{
         const response=await fetch(AI_ENDPOINT,{
           method:'POST',

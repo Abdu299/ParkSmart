@@ -74,7 +74,7 @@
     if (/\bmc\b|motorsykkel/.test(normalized)) candidates = candidates.filter(place => place.kind === 'mc' || place.mcFree);
     if (/lad|elbil/.test(normalized)) candidates = candidates.filter(place => place.chargingSpaces > 0);
     if (/\bhc\b|handikap|funksjonshem/.test(normalized)) candidates = candidates.filter(place => place.hcSpaces > 0);
-    if (/gratis|avgiftsfri|uten å betale/.test(normalized)) candidates = candidates.filter(place => place.isFreeNow === true || place.free);
+    if (/gratis|avgiftsfri|uten å betale/.test(normalized)) candidates = candidates.filter(place => place.isFreeNow === true);
     return candidates
       .map(place => ({ place, distance: distanceMeters(appPerson, place.center) }))
       .sort((a, b) => a.distance - b.distance)
@@ -111,7 +111,41 @@
     if (input()) input().disabled = value;
   }
 
+  function answerParkingSearchLocally(question) {
+    const normalized = question.toLocaleLowerCase('nb-NO');
+    if (!/nærmest|i nærheten|nær meg|hvor er|finn.*parkering/.test(normalized) || !appPerson) return false;
+    const parking = relevantParking(question);
+    const asksFree = /gratis|avgiftsfri|uten å betale/.test(normalized);
+    const asksMc = /\bmc\b|motorsykkel/.test(normalized);
+    const asksCharging = /lad|elbil/.test(normalized);
+    const asksHc = /\bhc\b|handikap|funksjonshem/.test(normalized);
+    const kind = asksFree ? 'gratisparkering' : asksMc ? 'MC-parkering' : asksCharging ? 'parkering med lading' : asksHc ? 'HC-parkering' : 'parkering';
+
+    if (!parking.length) {
+      const answer = 'Jeg fant ingen registrert ' + kind + ' i parkeringsdataene rundt posisjonen din. Prøv kartet eller fjern noen av filtrene.';
+      addMessage('assistant', answer);
+      history.push({ role: 'assistant', text: answer });
+      return true;
+    }
+
+    const nearest = parking[0];
+    const source = PARKING_DATA.find(place => place.id === nearest.id);
+    const distance = source ? formatDistance(source) : Math.round(nearest.distanceMeters) + ' m';
+    const rule = String(nearest.statusDetail || nearest.status || '').trim().slice(0, 240);
+    const answer = 'Den nærmeste registrerte ' + kind + ' er ' + nearest.name + ', omtrent ' + distance + ' unna i luftlinje.' + (rule ? ' ' + rule : '') + ' Appen har ikke sanntidsdata om ledige plasser.';
+    const result = addMessage('assistant', answer);
+    if (result) addParkingCards(result.bubble, parking.slice(0, 3).map(place => place.id));
+    history.push({ role: 'assistant', text: answer.slice(0, 1500) });
+    if (history.length > 12) history.splice(0, history.length - 12);
+    return true;
+  }
+
   function sendQuestion(question) {
+    if (answerParkingSearchLocally(question)) {
+      window.removeAiPhoto();
+      setBusy(false);
+      return;
+    }
     const parking = relevantParking(question);
     const requestId = 'ai-' + Date.now() + '-' + (++requestNumber);
     const waiting = addMessage('assistant', imageDataUrl ? 'Analyserer bildet og parkeringsdataene …' : 'Sjekker parkeringsdataene …', { loading: true });
@@ -120,7 +154,7 @@
       requestTimers.delete(requestId);
       expiredRequests.add(requestId);
       receiveAiError({ requestId, message: 'AI-tjenesten brukte for lang tid. Prøv igjen.', watchdog: true });
-    }, 55000));
+    }, 20000));
     setBusy(true);
     const sent = nativeSend({
       type: 'aiAsk',

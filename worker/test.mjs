@@ -47,13 +47,13 @@ test('rejects requests without a question before calling Gemini', async () => {
   assert.equal(response.status, 400);
 });
 
-test('retries temporary errors and uses the fallback model', async () => {
+test('uses the fallback model after a temporary error', async () => {
   const originalFetch = globalThis.fetch;
   const models = [];
   globalThis.fetch = async (_url, options) => {
     const request = JSON.parse(options.body);
     models.push(request.model);
-    if (models.length < 3) {
+    if (models.length < 2) {
       return new Response(JSON.stringify({ error: { message: 'High demand' } }), {
         status: 503,
         headers: { 'Content-Type': 'application/json' }
@@ -77,7 +77,7 @@ test('retries temporary errors and uses the fallback model', async () => {
       GEMINI_FALLBACK_MODEL: 'fallback-model'
     });
     assert.equal(response.status, 200);
-    assert.deepEqual(models, ['primary-model', 'primary-model', 'fallback-model']);
+    assert.deepEqual(models, ['primary-model', 'fallback-model']);
   } finally {
     globalThis.fetch = originalFetch;
   }
