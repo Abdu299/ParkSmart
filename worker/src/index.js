@@ -71,6 +71,8 @@ function sanitizeParking(value) {
       payment: String(place.payment || '').slice(0, 40),
       maxStay: place.maxStay ? String(place.maxStay).slice(0, 120) : null,
       feeHours: place.feeHours ? String(place.feeHours).slice(0, 200) : null,
+      regular: place.regular ? String(place.regular).slice(0, 500) : null,
+      electric: place.electric ? String(place.electric).slice(0, 500) : null,
       chargingSpaces: Number.isFinite(place.chargingSpaces) ? place.chargingSpaces : 0,
       hcSpaces: Number.isFinite(place.hcSpaces) ? place.hcSpaces : 0,
       source: String(place.source || '').slice(0, 80),

@@ -5,6 +5,7 @@
   let busy = false;
   let requestNumber = 0;
   let pendingLocationQuestion = null;
+  let lastParkingIds = [];
   const history = [];
   const requestTimers = new Map();
   const expiredRequests = new Set();
@@ -70,7 +71,31 @@
   function relevantParking(question) {
     if (!Array.isArray(appPerson) || appPerson.length !== 2) return [];
     const normalized = question.toLocaleLowerCase('nb-NO');
-    let candidates = PARKING_DATA.filter(place => !place.forbidden);
+    const isFollowUp = /den første|det første|den andre|det andre|den tredje|det tredje|denne|den der|må jeg betale|hvor mye|hva koster|pris/.test(normalized) && lastParkingIds.length;
+    let candidates = isFollowUp
+      ? lastParkingIds.map(id => PARKING_DATA.find(place => place.id === id)).filter(Boolean)
+      : PARKING_DATA.filter(place => !place.forbidden);
+    if (isFollowUp) {
+      return candidates.slice(0, 8).map(place => ({
+        id: place.id,
+        name: place.name,
+        address: place.address || 'Adresse ikke oppgitt',
+        type: place.kind,
+        distanceMeters: Math.round(distanceMeters(appPerson, place.center)),
+        status: place.status,
+        statusDetail: place.statusDetail,
+        isFreeNow: place.isFreeNow,
+        payment: place.payment,
+        maxStay: place.maxStay || null,
+        feeHours: place.feeHours || null,
+        regular: place.regular || null,
+        electric: place.electric || null,
+        chargingSpaces: place.chargingSpaces || 0,
+        hcSpaces: place.hcSpaces || 0,
+        source: place.source,
+        fetchedAt: place.fetchedAt
+      }));
+    }
     if (/\bmc\b|motorsykkel/.test(normalized)) candidates = candidates.filter(place => place.kind === 'mc' || place.mcFree);
     if (/lad|elbil/.test(normalized)) candidates = candidates.filter(place => place.chargingSpaces > 0);
     if (/\bhc\b|handikap|funksjonshem/.test(normalized)) candidates = candidates.filter(place => place.hcSpaces > 0);
@@ -91,6 +116,8 @@
         payment: place.payment,
         maxStay: place.maxStay || null,
         feeHours: place.feeHours || null,
+        regular: place.regular || null,
+        electric: place.electric || null,
         chargingSpaces: place.chargingSpaces || 0,
         hcSpaces: place.hcSpaces || 0,
         source: place.source,
@@ -99,7 +126,7 @@
   }
 
   function needsLocation(question) {
-    return /nærmest|i nærheten|nær meg|hvor er|finn.*parkering/.test(question.toLocaleLowerCase('nb-NO'));
+    return /nærmest|i nærheten|i området|nær meg|rundt meg|hvor er|finn.*parkering|finnes.*parkering/.test(question.toLocaleLowerCase('nb-NO'));
   }
 
   function setBusy(value) {
@@ -113,7 +140,7 @@
 
   function answerParkingSearchLocally(question) {
     const normalized = question.toLocaleLowerCase('nb-NO');
-    if (!/nærmest|i nærheten|nær meg|hvor er|finn.*parkering/.test(normalized) || !appPerson) return false;
+    if (!/nærmest|i nærheten|i området|nær meg|rundt meg|hvor er|finn.*parkering|finnes.*parkering/.test(normalized) || !appPerson) return false;
     const parking = relevantParking(question);
     const asksFree = /gratis|avgiftsfri|uten å betale/.test(normalized);
     const asksMc = /\bmc\b|motorsykkel/.test(normalized);
@@ -134,7 +161,8 @@
     const rule = String(nearest.statusDetail || nearest.status || '').trim().slice(0, 240);
     const answer = 'Den nærmeste registrerte ' + kind + ' er ' + nearest.name + ', omtrent ' + distance + ' unna i luftlinje.' + (rule ? ' ' + rule : '') + ' Appen har ikke sanntidsdata om ledige plasser.';
     const result = addMessage('assistant', answer);
-    if (result) addParkingCards(result.bubble, parking.slice(0, 3).map(place => place.id));
+    lastParkingIds = parking.slice(0, 3).map(place => place.id);
+    if (result) addParkingCards(result.bubble, lastParkingIds);
     history.push({ role: 'assistant', text: answer.slice(0, 1500) });
     if (history.length > 12) history.splice(0, history.length - 12);
     return true;
@@ -208,6 +236,7 @@
     const answer = typeof packet.answer === 'string' && packet.answer.trim() ? packet.answer.trim() : 'Jeg klarte ikke å lage et svar. Prøv å formulere spørsmålet på nytt.';
     const result = addMessage('assistant', answer);
     if (result) addParkingCards(result.bubble, packet.parkingIds);
+    if (Array.isArray(packet.parkingIds) && packet.parkingIds.length) lastParkingIds = packet.parkingIds.slice(0, 3);
     history.push({ role: 'assistant', text: answer.slice(0, 1500) });
     if (history.length > 12) history.splice(0, history.length - 12);
     window.removeAiPhoto();
