@@ -213,7 +213,9 @@
   background: transparent;
   color: var(--ink);
   font: inherit;
+  font-size: 16px;
   line-height: 1.4;
+  caret-color: var(--blue);
 }
 
 .ai-camera,
@@ -289,6 +291,7 @@ html[data-theme="dark"] .ai-photo button {
 
 html[data-theme="dark"] .ai-composer textarea {
   color: #e5edf5;
+  caret-color: #8bb9ff;
 }
 
 html[data-theme="dark"] .ai-composer textarea::placeholder {
@@ -299,6 +302,37 @@ html[data-theme="dark"] .ai-bubble.ai-error {
   border-color: #7e4141;
   background: #3c2528;
   color: #ffb9b9;
+}
+
+/* Keep iOS from scrolling the entire WebView when the keyboard opens. */
+html.ai-keyboard-open,
+html.ai-keyboard-open body {
+  width: 100%;
+  height: var(--ai-viewport-height, 100%);
+  overflow: hidden;
+}
+
+html.ai-keyboard-open body {
+  position: fixed;
+  inset: 0;
+}
+
+html.ai-keyboard-open .phone {
+  height: 100%;
+}
+
+html.ai-keyboard-open #appNavigation,
+html.ai-keyboard-open .ai-suggestions,
+html.ai-keyboard-open .ai-disclaimer {
+  display: none;
+}
+
+html.ai-keyboard-open #ai .top {
+  display: block;
+}
+
+html.ai-keyboard-open .ai-messages {
+  padding-top: 10px;
 }
 
 @media (max-height: 650px) {

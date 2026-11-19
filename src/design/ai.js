@@ -10,6 +10,23 @@
   const messages = () => document.getElementById('aiMessages');
   const input = () => document.getElementById('aiInput');
 
+  function resetDocumentScroll() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+
+  function setKeyboardLayout(open) {
+    const viewport = window.visualViewport;
+    const height = viewport ? viewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--ai-viewport-height', Math.round(height) + 'px');
+    document.documentElement.classList.toggle('ai-keyboard-open', open);
+    if (open) {
+      resetDocumentScroll();
+      requestAnimationFrame(resetDocumentScroll);
+    }
+  }
+
   function scrollToLatest() {
     const list = messages();
     if (list) requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
@@ -232,6 +249,18 @@
 
   const field = input();
   if (field) {
+    field.addEventListener('focus', () => {
+      setKeyboardLayout(true);
+      setTimeout(() => {
+        setKeyboardLayout(true);
+        scrollToLatest();
+      }, 120);
+    });
+    field.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement !== field) setKeyboardLayout(false);
+      }, 180);
+    });
     field.addEventListener('input', () => {
       field.style.height = 'auto';
       field.style.height = Math.min(field.scrollHeight, 96) + 'px';
@@ -241,6 +270,14 @@
         event.preventDefault();
         window.submitAiQuestion();
       }
+    });
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (document.activeElement === field) setKeyboardLayout(true);
+    });
+    window.visualViewport.addEventListener('scroll', () => {
+      if (document.activeElement === field) setKeyboardLayout(true);
     });
   }
 })();

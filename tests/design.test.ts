@@ -9,6 +9,6 @@ test('All original sign images, text, sources and 298 signs are preserved byte f
 });
 test('Every original page is retained with profile login and a working AI chat shell',()=>{
  for(const id of [...source.matchAll(/<section id="([^"]+)"/g)].map(m=>m[1]))assert.ok(output.includes(`<section id="${id}"`),id);
- assert.ok(output.includes('Spør om parkering …'));assert.ok(output.includes('submitAiQuestion(event)'));assert.ok(output.includes('Logg inn for å se profilen din'));
+ assert.ok(output.includes('Spør om parkering …'));assert.ok(output.includes('submitAiQuestion(event)'));assert.ok(output.includes('ai-keyboard-open'));assert.ok(output.includes('visualViewport'));assert.ok(output.includes('Logg inn for å se profilen din'));
  assert.ok(output.includes('requestHomeLocation()'));assert.ok(!output.includes('<span id="homearea">Oslo sentrum</span>'));
 });
