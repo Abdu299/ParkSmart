@@ -1,0 +1,341 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+.phone {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.screen {
+  flex: 1 1 0%;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.scroll {
+  min-height: 0;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.top, .parking-top {
+  position: relative;
+  z-index: 1100;
+  flex: 0 0 auto;
+  min-height: 64px;
+  padding: 10px 16px;
+  background: var(--navy);
+  color: white;
+}
+
+.top h2 {
+  min-height: 44px;
+  margin: 0;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.top .back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #ffffff1f;
+  border-radius: 13px;
+  background: #ffffff0d;
+  color: white;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.top .back:active {
+  background: #ffffff26;
+}
+
+.map-version {
+  min-height: 44px;
+  padding: 0 0 0 8px;
+  font-size: 11px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.guide-badge {
+  font-size: 10px;
+}
+
+/* Felles bunnmeny. */
+.app-nav {
+  position: relative;
+  z-index: 1200;
+  display: flex;
+  flex: 0 0 auto;
+  width: 100%;
+  height: calc(68px + env(safe-area-inset-bottom, 0px));
+  padding: 4px 8px calc(4px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: white;
+}
+
+.app-nav button {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 13px;
+  background: white;
+  color: #6b8190;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-nav .ico {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 29px;
+  border-radius: 10px;
+}
+
+.app-nav svg {
+  display: block;
+  width: 23px;
+  height: 23px;
+}
+
+.app-nav button.active {
+  color: var(--blue);
+  font-weight: 750;
+}
+
+.app-nav button.active .ico {
+  background: #eaf2ff;
+}
+
+.app-nav button:focus-visible,
+.top .back:focus-visible {
+  outline: 3px solid #8bbafa;
+  outline-offset: -3px;
+}
+
+/* Skjul topplinjen bare på Finn parkering. */
+#find > .top {
+  display: none;
+}
+
+#find .parking-toolbar {
+  max-height: 45%;
+  overflow-y: auto;
+}
+
+#find .parking-map-wrap {
+  flex: 1 1 0%;
+  min-height: 0;
+  isolation: isolate;
+}
+
+#find .parking-sheet {
+  max-height: 28%;
+}
+
+#find .parking-sheet.expanded {
+  max-height: 45%;
+}
+
+/* Kompakt listeknapp. */
+#find .parking-summary {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0 4px;
+  background: white;
+}
+
+#find #listToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 7px 10px;
+  border: 1px solid #dce7f5;
+  border-radius: 11px;
+  background: #f0f5fc;
+  color: var(--blue);
+  text-align: left;
+  box-shadow: none;
+}
+
+#find #listToggle:active {
+  background: #e1ecfc;
+}
+
+#find #listToggle:focus-visible {
+  outline: 3px solid #8bbafa;
+  outline-offset: 3px;
+}
+
+#find #listToggle .list-toggle-icon {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+}
+
+#find #listToggle .list-toggle-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 1px;
+  margin: 0;
+  color: var(--blue);
+}
+
+#find #listToggleLabel {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+#find #resultCount {
+  margin: 0;
+  font-size: 10px;
+  color: #647f92;
+  line-height: 1.3;
+}
+
+#find #totalCount {
+  display: none;
+}
+
+#find #listToggle .list-toggle-chevron {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+}
+
+#find #parkingSheet.expanded .list-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+#find .parking-summary .fit-button {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid var(--line);
+}
+
+.parking-controls {
+  flex-wrap: wrap;
+}
+
+.scan-body, .scan-preview-body {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+.login-required {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: clamp(28px, 8vh, 64px) 24px 28px;
+  background: linear-gradient(180deg, #f6f9fc 0%, white 65%);
+}
+
+.login-required .profileavatar {
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  border: 1px solid #dce9f5;
+  border-radius: 24px;
+  background: #eaf2ff;
+  color: var(--blue);
+}
+
+.login-required .profileavatar svg {
+  width: 32px;
+  height: 32px;
+}
+
+.login-required h2 {
+  max-width: 320px;
+  margin: 0 0 10px;
+  font-size: 23px;
+  line-height: 1.3;
+}
+
+.login-required p {
+  max-width: 290px;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.login-required > button {
+  width: 100%;
+  max-width: 330px;
+  min-height: 48px;
+  flex-shrink: 0;
+}
+
+.parking-details-price {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+#homearea {
+  text-align: left;
+}
+
+@media (max-height: 650px) {
+  #find .parking-toolbar {
+    max-height: 42%;
+  }
+
+  #find .parking-sheet:not(.expanded) #filterDescription {
+    display: none;
+  }
+
+  .scan-viewfinder {
+    min-height: 170px;
+  }
+
+  .login-required {
+    padding-top: 24px;
+  }
+}

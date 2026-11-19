@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "signs": 298,
+  "mc": 64,
+  "multipleFilters": true,
+  "homeLocation": true,
+  "bridgeActions": [
+    "locate",
+    "copy",
+    "navigate",
+    "photo"
+  ],
+  "errors": []
+}

@@ -1,0 +1,472 @@
+{
+  "passed": true,
+  "viewports": [
+    {
+      "width": 390,
+      "height": 740
+    },
+    {
+      "width": 360,
+      "height": 720
+    },
+    {
+      "width": 320,
+      "height": 480
+    },
+    {
+      "width": 768,
+      "height": 900
+    }
+  ],
+  "screensPerViewport": 11,
+  "checks": [
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "home",
+      "tab": "home",
+      "navBottom": 740
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "find",
+      "tab": "map",
+      "navBottom": 740,
+      "headerHeight": 64,
+      "mapHeight": 313.609375
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "profile",
+      "tab": "profile",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "ai",
+      "tab": "ai",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "guide",
+      "tab": "guide",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "scan",
+      "tab": "guide",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "guideDetail",
+      "tab": "guide",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "signPreview",
+      "tab": "guide",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "signResult",
+      "tab": "guide",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "details",
+      "tab": "map",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 740
+      },
+      "screen": "payment",
+      "tab": "map",
+      "navBottom": 740,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "home",
+      "tab": "home",
+      "navBottom": 720
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "find",
+      "tab": "map",
+      "navBottom": 720,
+      "headerHeight": 64,
+      "mapHeight": 310.203125
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "profile",
+      "tab": "profile",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "ai",
+      "tab": "ai",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "guide",
+      "tab": "guide",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "scan",
+      "tab": "guide",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "guideDetail",
+      "tab": "guide",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "signPreview",
+      "tab": "guide",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "signResult",
+      "tab": "guide",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "details",
+      "tab": "map",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 360,
+        "height": 720
+      },
+      "screen": "payment",
+      "tab": "map",
+      "navBottom": 720,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "home",
+      "tab": "home",
+      "navBottom": 480
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "find",
+      "tab": "map",
+      "navBottom": 480,
+      "headerHeight": 64,
+      "mapHeight": 109.203125
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "profile",
+      "tab": "profile",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "ai",
+      "tab": "ai",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "guide",
+      "tab": "guide",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "scan",
+      "tab": "guide",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "guideDetail",
+      "tab": "guide",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "signPreview",
+      "tab": "guide",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "signResult",
+      "tab": "guide",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "details",
+      "tab": "map",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 320,
+        "height": 480
+      },
+      "screen": "payment",
+      "tab": "map",
+      "navBottom": 480,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "home",
+      "tab": "home",
+      "navBottom": 900
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "find",
+      "tab": "map",
+      "navBottom": 900,
+      "headerHeight": 64,
+      "mapHeight": 487.609375
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "profile",
+      "tab": "profile",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "ai",
+      "tab": "ai",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "guide",
+      "tab": "guide",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "scan",
+      "tab": "guide",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "guideDetail",
+      "tab": "guide",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "signPreview",
+      "tab": "guide",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "signResult",
+      "tab": "guide",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "details",
+      "tab": "map",
+      "navBottom": 900,
+      "headerHeight": 64
+    },
+    {
+      "size": {
+        "width": 768,
+        "height": 900
+      },
+      "screen": "payment",
+      "tab": "map",
+      "navBottom": 900,
+      "headerHeight": 64
+    }
+  ],
+  "marker": {
+    "color": "rgb(230, 0, 126)",
+    "width": 28,
+    "pane": "680",
+    "topmost": "leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
+  },
+  "errors": [],
+  "notes": "Browser layout and simulated native bridge. Map tiles replaced with a neutral fixture; physical iOS/Android safe areas still require device testing."
+}
