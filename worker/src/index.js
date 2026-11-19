@@ -94,6 +94,48 @@ function parseModelJson(text) {
   return result;
 }
 
+const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
+
+function wait(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function requestGemini(env, model, payload) {
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': env.GEMINI_API_KEY,
+        'Api-Revision': '2026-05-20'
+      },
+      body: JSON.stringify({ ...payload, model }),
+      signal: AbortSignal.timeout(14000)
+    });
+    const body = await response.json().catch(() => ({}));
+    return { response, body };
+  } catch {
+    return {
+      response: new Response(null, { status: 503 }),
+      body: { error: { message: 'Upstream unavailable' } }
+    };
+  }
+}
+
+async function requestWithFallback(env, payload) {
+  const primary = env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const fallback = env.GEMINI_FALLBACK_MODEL || 'gemini-3.6-flash';
+  const models = [primary, primary, fallback];
+  let lastResult;
+
+  for (let index = 0; index < models.length; index += 1) {
+    if (index === 1) await wait(450);
+    lastResult = await requestGemini(env, models[index], payload);
+    if (lastResult.response.ok || !RETRYABLE_STATUSES.has(lastResult.response.status)) return lastResult;
+  }
+  return lastResult;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return json({}, 204);
@@ -123,35 +165,24 @@ export default {
       const input = [{ type: 'text', text: context }];
       if (image) input.push({ type: 'image', data: image.data, mime_type: image.mimeType });
 
-      const model = env.GEMINI_MODEL || 'gemini-3.8-flash';
-      const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': env.GEMINI_API_KEY,
-          'Api-Revision': '2026-05-20'
+      const { response: upstream, body: upstreamBody } = await requestWithFallback(env, {
+        input,
+        store: false,
+        system_instruction: SYSTEM_PROMPT,
+        generation_config: {
+          temperature: 0.2,
+          max_output_tokens: 900
         },
-        body: JSON.stringify({
-          model,
-          input,
-          store: false,
-          system_instruction: SYSTEM_PROMPT,
-          generation_config: {
-            temperature: 0.2,
-            max_output_tokens: 900
-          },
-          response_format: {
-            type: 'text',
-            mime_type: 'application/json',
-            schema: RESPONSE_SCHEMA
-          }
-        })
+        response_format: {
+          type: 'text',
+          mime_type: 'application/json',
+          schema: RESPONSE_SCHEMA
+        }
       });
-
-      const upstreamBody = await upstream.json();
       if (!upstream.ok) {
-        const detail = upstreamBody?.error?.message || 'Gemini svarte med en feil.';
-        return json({ error: upstream.status === 429 ? 'Gratis AI-kvote er midlertidig brukt opp. Prøv igjen senere.' : detail }, upstream.status === 429 ? 429 : 502);
+        if (upstream.status === 429) return json({ error: 'Gratis AI-kvote er midlertidig brukt opp. Vent litt og prøv igjen.' }, 429);
+        if (RETRYABLE_STATUSES.has(upstream.status)) return json({ error: 'AI-tjenesten er midlertidig opptatt. Vent litt og prøv igjen.' }, 503);
+        return json({ error: 'AI-tjenesten kunne ikke behandle spørsmålet. Prøv å formulere det på en annen måte.' }, 502);
       }
       const text = upstreamBody?.steps
         ?.filter(step => step?.type === 'model_output')

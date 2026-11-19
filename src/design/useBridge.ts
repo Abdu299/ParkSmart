@@ -63,7 +63,7 @@ export function useDesignBridge(send: (packet: unknown) => void) {
       if(!AI_ENDPOINT){send({type:'aiError',requestId,message:'AI er ikke konfigurert ennå. Legg EXPO_PUBLIC_PARKSMART_AI_URL i .env og start Expo på nytt.'});return;}
       if(typeof packet.question!=='string'||packet.question.trim().length===0){send({type:'aiError',requestId,message:'Skriv et spørsmål først.'});return;}
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),30000);
+      const timeout=setTimeout(()=>controller.abort(),50000);
       try{
         const response=await fetch(AI_ENDPOINT,{
           method:'POST',
@@ -83,7 +83,9 @@ export function useDesignBridge(send: (packet: unknown) => void) {
         if(typeof result.answer!=='string')throw new Error('AI-tjenesten ga et ugyldig svar.');
         send({type:'aiResult',requestId,answer:result.answer,parkingIds:Array.isArray(result.parkingIds)?result.parkingIds.filter((id):id is string=>typeof id==='string').slice(0,3):[]});
       }catch(error){
-        const message=error instanceof Error&&error.name==='AbortError'?'AI brukte for lang tid. Prøv igjen.':error instanceof Error?error.message:'AI-tjenesten svarte ikke. Prøv igjen om litt.';
+        const raw=error instanceof Error?error.message:'';
+        const timedOut=error instanceof Error&&(error.name==='AbortError'||/cancel|abort|timed?\s*out/i.test(raw));
+        const message=timedOut?'AI-tjenesten brukte for lang tid. Prøv igjen.':raw||'AI-tjenesten svarte ikke. Prøv igjen om litt.';
         send({type:'aiError',requestId,message});
       }finally{clearTimeout(timeout);}
       return;

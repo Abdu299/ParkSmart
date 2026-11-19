@@ -46,3 +46,39 @@ test('rejects requests without a question before calling Gemini', async () => {
   }), { GEMINI_API_KEY: 'test-key' });
   assert.equal(response.status, 400);
 });
+
+test('retries temporary errors and uses the fallback model', async () => {
+  const originalFetch = globalThis.fetch;
+  const models = [];
+  globalThis.fetch = async (_url, options) => {
+    const request = JSON.parse(options.body);
+    models.push(request.model);
+    if (models.length < 3) {
+      return new Response(JSON.stringify({ error: { message: 'High demand' } }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    return new Response(JSON.stringify({
+      steps: [{
+        type: 'model_output',
+        content: [{ type: 'text', text: JSON.stringify({ answer: 'Reserve-modellen svarte.', parkingIds: [], confidence: 'high' }) }]
+      }]
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  try {
+    const response = await worker.fetch(new Request('https://worker.test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: 'Hei' })
+    }), {
+      GEMINI_API_KEY: 'test-key',
+      GEMINI_MODEL: 'primary-model',
+      GEMINI_FALLBACK_MODEL: 'fallback-model'
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(models, ['primary-model', 'primary-model', 'fallback-model']);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

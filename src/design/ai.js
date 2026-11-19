@@ -6,6 +6,8 @@
   let requestNumber = 0;
   let pendingLocationQuestion = null;
   const history = [];
+  const requestTimers = new Map();
+  const expiredRequests = new Set();
 
   const messages = () => document.getElementById('aiMessages');
   const input = () => document.getElementById('aiInput');
@@ -114,6 +116,11 @@
     const requestId = 'ai-' + Date.now() + '-' + (++requestNumber);
     const waiting = addMessage('assistant', imageDataUrl ? 'Analyserer bildet og parkeringsdataene …' : 'Sjekker parkeringsdataene …', { loading: true });
     if (waiting) waiting.row.dataset.requestId = requestId;
+    requestTimers.set(requestId, setTimeout(() => {
+      requestTimers.delete(requestId);
+      expiredRequests.add(requestId);
+      receiveAiError({ requestId, message: 'AI-tjenesten brukte for lang tid. Prøv igjen.', watchdog: true });
+    }, 55000));
     setBusy(true);
     const sent = nativeSend({
       type: 'aiAsk',
@@ -158,7 +165,11 @@
   }
 
   function receiveAiResult(packet) {
-    const waiting = document.querySelector('[data-request-id="' + CSS.escape(String(packet.requestId || '')) + '"]');
+    const requestId = String(packet.requestId || '');
+    if (expiredRequests.has(requestId)) { expiredRequests.delete(requestId); return; }
+    clearTimeout(requestTimers.get(requestId));
+    requestTimers.delete(requestId);
+    const waiting = document.querySelector('[data-request-id="' + CSS.escape(requestId) + '"]');
     if (waiting) waiting.remove();
     const answer = typeof packet.answer === 'string' && packet.answer.trim() ? packet.answer.trim() : 'Jeg klarte ikke å lage et svar. Prøv å formulere spørsmålet på nytt.';
     const result = addMessage('assistant', answer);
@@ -171,7 +182,11 @@
   }
 
   function receiveAiError(packet) {
-    const waiting = document.querySelector('[data-request-id="' + CSS.escape(String(packet.requestId || '')) + '"]');
+    const requestId = String(packet.requestId || '');
+    if (expiredRequests.has(requestId) && !packet.watchdog) { expiredRequests.delete(requestId); return; }
+    clearTimeout(requestTimers.get(requestId));
+    requestTimers.delete(requestId);
+    const waiting = document.querySelector('[data-request-id="' + CSS.escape(requestId) + '"]');
     if (waiting) waiting.remove();
     addMessage('assistant', packet.message || 'AI-tjenesten svarte ikke. Prøv igjen om litt.', { error: true });
     setBusy(false);
