@@ -6,13 +6,19 @@ test('returns structured answer and removes parking IDs not present in app conte
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (_url, options) => {
     const request = JSON.parse(options.body);
-    assert.equal(request.generationConfig.responseMimeType, 'application/json');
+    assert.equal(_url, 'https://generativelanguage.googleapis.com/v1beta/interactions');
+    assert.equal(request.model, 'test-model');
+    assert.equal(request.response_format.mime_type, 'application/json');
     return new Response(JSON.stringify({
-      candidates: [{ content: { parts: [{ text: JSON.stringify({
-        answer: 'Plassen i Storgata er nærmest.',
-        parkingIds: ['valid-place', 'invented-place'],
-        confidence: 'high'
-      }) }] } }]
+      status: 'completed',
+      steps: [{
+        type: 'model_output',
+        content: [{ type: 'text', text: JSON.stringify({
+          answer: 'Plassen i Storgata er nærmest.',
+          parkingIds: ['valid-place', 'invented-place'],
+          confidence: 'high'
+        }) }]
+      }]
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
   try {

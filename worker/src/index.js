@@ -14,16 +14,16 @@ Regler du alltid må følge:
 Returner bare JSON som følger skjemaet.`;
 
 const RESPONSE_SCHEMA = {
-  type: 'OBJECT',
+  type: 'object',
   properties: {
-    answer: { type: 'STRING', description: 'Det norske svaret til brukeren.' },
+    answer: { type: 'string', description: 'Det norske svaret til brukeren.' },
     parkingIds: {
-      type: 'ARRAY',
+      type: 'array',
       description: 'Null til tre relevante ID-er, kun fra PARKERINGSDATA.',
-      items: { type: 'STRING' }
+      items: { type: 'string' }
     },
     confidence: {
-      type: 'STRING',
+      type: 'string',
       enum: ['high', 'medium', 'low'],
       description: 'Sikkerhet i svaret, særlig ved bildetolkning.'
     }
@@ -120,24 +120,30 @@ export default {
         'SAMTALEHISTORIKK:\n' + JSON.stringify(history),
         'PARKERINGSDATA (sortert nærmest først):\n' + JSON.stringify(parking)
       ].join('\n\n');
-      const parts = [{ text: context }];
-      if (image) parts.push({ inlineData: image });
+      const input = [{ type: 'text', text: context }];
+      if (image) input.push({ type: 'image', data: image.data, mime_type: image.mimeType });
 
-      const model = env.GEMINI_MODEL || 'gemini-2.5-flash';
-      const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      const model = env.GEMINI_MODEL || 'gemini-3.8-flash';
+      const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': env.GEMINI_API_KEY
+          'x-goog-api-key': env.GEMINI_API_KEY,
+          'Api-Revision': '2026-05-20'
         },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ role: 'user', parts }],
-          generationConfig: {
+          model,
+          input,
+          store: false,
+          system_instruction: SYSTEM_PROMPT,
+          generation_config: {
             temperature: 0.2,
-            maxOutputTokens: 900,
-            responseMimeType: 'application/json',
-            responseSchema: RESPONSE_SCHEMA
+            max_output_tokens: 900
+          },
+          response_format: {
+            type: 'text',
+            mime_type: 'application/json',
+            schema: RESPONSE_SCHEMA
           }
         })
       });
@@ -147,7 +153,13 @@ export default {
         const detail = upstreamBody?.error?.message || 'Gemini svarte med en feil.';
         return json({ error: upstream.status === 429 ? 'Gratis AI-kvote er midlertidig brukt opp. Prøv igjen senere.' : detail }, upstream.status === 429 ? 429 : 502);
       }
-      const text = upstreamBody?.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim();
+      const text = upstreamBody?.steps
+        ?.filter(step => step?.type === 'model_output')
+        .flatMap(step => Array.isArray(step.content) ? step.content : [])
+        .filter(content => content?.type === 'text')
+        .map(content => content.text || '')
+        .join('')
+        .trim();
       if (!text) return json({ error: 'Gemini ga ikke noe svar.' }, 502);
       const result = parseModelJson(text);
       const allowedIds = new Set(parking.map(place => place.id));
