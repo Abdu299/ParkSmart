@@ -123,11 +123,34 @@ function authPage() {
     <p id="authStatus" class="auth-status" role="status" aria-live="polite"></p>
    </div>
    <div id="authSignedIn" class="auth-card auth-profile" hidden>
-    <div class="profileavatar" aria-hidden="true">${navIcon('profile')}</div>
-    <small>INNLOGGET SOM</small>
-    <h2 id="authUserEmail"></h2>
-    <p class="muted">Kontoen din er klar. Favoritter og flere profilfunksjoner kommer i neste versjon.</p>
-    <button class="btn outline" type="button" onclick="logoutParkSmart()">Logg ut</button>
+    <div class="profile-account">
+     <div class="profileavatar" aria-hidden="true">${navIcon('profile')}</div>
+     <div><small>INNLOGGET SOM</small><h2 id="authUserEmail"></h2></div>
+    </div>
+    <section class="profile-section" aria-labelledby="favoritesTitle">
+     <div class="profile-section-title"><div><small>DINE STEDER</small><h3 id="favoritesTitle">Favorittplasser</h3></div><span class="profile-coming">Kommer snart</span></div>
+     <div class="profile-empty"><span aria-hidden="true">☆</span><div><strong>Ingen stjernemerkede plasser ennå</strong><p>Senere kan du trykke på stjernen ved en parkeringsplass for å lagre den her.</p></div></div>
+    </section>
+    <section class="profile-section" aria-labelledby="appearanceTitle">
+     <div class="profile-section-title"><div><small>INNSTILLINGER</small><h3 id="appearanceTitle">Utseende</h3></div></div>
+     <p class="profile-setting-label">Fargetema</p>
+     <div class="profile-segments" role="group" aria-label="Velg fargetema">
+      <button type="button" data-theme-choice="system" onclick="setParkSmartTheme('system')">Automatisk</button>
+      <button type="button" data-theme-choice="light" onclick="setParkSmartTheme('light')">Lys</button>
+      <button type="button" data-theme-choice="dark" onclick="setParkSmartTheme('dark')">Mørk</button>
+     </div>
+     <p class="profile-setting-help">Automatisk følger innstillingen på telefonen.</p>
+     <p class="profile-setting-label">Standard kjøretøy</p>
+     <div class="profile-segments profile-vehicle-choice" role="group" aria-label="Velg standard kjøretøy">
+      <button type="button" data-profile-vehicle="Bil" onclick="setProfileVehicle('Bil')">🚘 Bil</button>
+      <button type="button" data-profile-vehicle="MC" onclick="setProfileVehicle('MC')">🏍 MC</button>
+     </div>
+    </section>
+    <section class="profile-section" aria-labelledby="accountTitle">
+     <div class="profile-section-title"><div><small>SIKKERHET</small><h3 id="accountTitle">Konto</h3></div></div>
+     <button class="profile-action" type="button" onclick="resetSignedInPassword()"><span>✉</span><span><strong>Endre passord</strong><small>Få tilsendt en sikker lenke på e-post</small></span><b>›</b></button>
+     <button class="btn outline profile-logout" type="button" onclick="logoutParkSmart()">Logg ut</button>
+    </section>
     <p id="authProfileStatus" class="auth-status" role="status" aria-live="polite"></p>
    </div>
   </div>
