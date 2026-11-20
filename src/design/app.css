@@ -1,3 +1,4 @@
+/* Shared mobile shell. Native safe areas are handled outside the WebView. */
 html, body {
   width: 100%;
   height: 100%;
@@ -5,7 +6,6 @@ html, body {
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
 }
-
 .phone {
   display: flex;
   flex-direction: column;
@@ -18,7 +18,6 @@ html, body {
   box-shadow: none;
   padding-top: env(safe-area-inset-top, 0px);
 }
-
 .screen {
   flex: 1 1 0%;
   width: 100%;
@@ -27,13 +26,12 @@ html, body {
   min-height: 0;
   overflow: hidden;
 }
-
 .scroll {
   min-height: 0;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
-
+/* Consistent headers with full-size back buttons and room for every title. */
 .top, .parking-top {
   position: relative;
   z-index: 1100;
@@ -43,7 +41,6 @@ html, body {
   background: var(--navy);
   color: white;
 }
-
 .top h2 {
   min-height: 44px;
   margin: 0;
@@ -52,7 +49,6 @@ html, body {
   font-weight: 700;
   line-height: 1.35;
 }
-
 .top .back {
   display: inline-flex;
   align-items: center;
@@ -68,11 +64,7 @@ html, body {
   font-size: 30px;
   line-height: 1;
 }
-
-.top .back:active {
-  background: #ffffff26;
-}
-
+.top .back:active { background: #ffffff26; }
 .map-version {
   min-height: 44px;
   padding: 0 0 0 8px;
@@ -80,12 +72,8 @@ html, body {
   opacity: 0.85;
   white-space: nowrap;
 }
-
-.guide-badge {
-  font-size: 10px;
-}
-
-/* Felles bunnmeny. */
+.guide-badge { font-size: 10px; }
+/* One bar outside the screens: maps, lists and scrolling cannot hide it. */
 .app-nav {
   position: relative;
   z-index: 1200;
@@ -97,7 +85,6 @@ html, body {
   border-top: 1px solid var(--line);
   background: white;
 }
-
 .app-nav button {
   display: flex;
   flex: 1;
@@ -117,7 +104,6 @@ html, body {
   font-weight: 500;
   -webkit-tap-highlight-color: transparent;
 }
-
 .app-nav .ico {
   display: grid;
   place-items: center;
@@ -125,63 +111,21 @@ html, body {
   height: 29px;
   border-radius: 10px;
 }
-
-.app-nav svg {
-  display: block;
-  width: 23px;
-  height: 23px;
-}
-
-.app-nav button.active {
-  color: var(--blue);
-  font-weight: 750;
-}
-
-.app-nav button.active .ico {
-  background: #eaf2ff;
-}
-
-.app-nav button:focus-visible,
-.top .back:focus-visible {
+.app-nav svg { display: block; width: 23px; height: 23px; }
+.app-nav button.active { color: var(--blue); font-weight: 750; }
+.app-nav button.active .ico { background: #eaf2ff; }
+.app-nav button:focus-visible, .top .back:focus-visible {
   outline: 3px solid #8bbafa;
   outline-offset: -3px;
 }
-
-/* Skjul topplinjen bare på Finn parkering. */
-#find > .top {
-  display: none;
-}
-
-#find .parking-toolbar {
-  max-height: 45%;
-  overflow-y: auto;
-}
-
-#find .parking-map-wrap {
-  flex: 1 1 0%;
-  min-height: 0;
-  isolation: isolate;
-}
-
-#find .parking-sheet {
-  max-height: 28%;
-}
-
-#find .parking-sheet.expanded {
-  max-height: 45%;
-}
-
-/* Kompakt listeknapp. */
-#find .parking-summary {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 0 4px;
-  background: white;
-}
-
+/* Reserve a separate row for navigation while the map uses remaining space. */
+#find > .top { display: none; }
+#find .parking-toolbar { max-height: 45%; overflow-y: auto; }
+#find .parking-map-wrap { flex: 1 1 0%; min-height: 0; isolation: isolate; }
+#find .parking-sheet { max-height: 28%; }
+#find .parking-sheet.expanded { max-height: 45%; }
+/* Compact list action with the same visual weight as the other controls. */
+#find .parking-summary { position: sticky; top: 0; z-index: 2; gap: 8px; align-items: center; padding: 8px 0 4px; background: white; }
 #find #listToggle {
   display: flex;
   align-items: center;
@@ -196,22 +140,9 @@ html, body {
   text-align: left;
   box-shadow: none;
 }
-
-#find #listToggle:active {
-  background: #e1ecfc;
-}
-
-#find #listToggle:focus-visible {
-  outline: 3px solid #8bbafa;
-  outline-offset: 3px;
-}
-
-#find #listToggle .list-toggle-icon {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
-}
-
+#find #listToggle:active { background: #e1ecfc; }
+#find #listToggle:focus-visible { outline: 3px solid #8bbafa; outline-offset: 3px; }
+#find #listToggle .list-toggle-icon { flex: 0 0 18px; width: 18px; height: 18px; }
 #find #listToggle .list-toggle-content {
   display: flex;
   flex: 1;
@@ -222,51 +153,14 @@ html, body {
   margin: 0;
   color: var(--blue);
 }
-
-#find #listToggleLabel {
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.3;
-}
-
-#find #resultCount {
-  margin: 0;
-  font-size: 10px;
-  color: #647f92;
-  line-height: 1.3;
-}
-
-#find #totalCount {
-  display: none;
-}
-
-#find #listToggle .list-toggle-chevron {
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-}
-
-#find #parkingSheet.expanded .list-toggle-chevron {
-  transform: rotate(180deg);
-}
-
-#find .parking-summary .fit-button {
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  border: 1px solid var(--line);
-}
-
-.parking-controls {
-  flex-wrap: wrap;
-}
-
-.scan-body, .scan-preview-body {
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-}
-
+#find #listToggleLabel { font-size: 12px; font-weight: 650; line-height: 1.3; }
+#find #resultCount { margin: 0; font-size: 10px; color: #647f92; line-height: 1.3; }
+#find #totalCount { display: none; }
+#find #listToggle .list-toggle-chevron { flex: 0 0 16px; width: 16px; height: 16px; }
+#find #parkingSheet.expanded .list-toggle-chevron { transform: rotate(180deg); }
+#find .parking-summary .fit-button { flex: 0 0 44px; width: 44px; height: 44px; margin: 0; border: 1px solid var(--line); }
+.parking-controls { flex-wrap: wrap; }
+.scan-body, .scan-preview-body { overflow-y: auto; overscroll-behavior-y: contain; }
 .login-required {
   display: flex;
   flex-direction: column;
@@ -276,7 +170,6 @@ html, body {
   padding: clamp(28px, 8vh, 64px) 24px 28px;
   background: linear-gradient(180deg, #f6f9fc 0%, white 65%);
 }
-
 .login-required .profileavatar {
   flex-shrink: 0;
   width: 76px;
@@ -287,55 +180,27 @@ html, body {
   background: #eaf2ff;
   color: var(--blue);
 }
-
-.login-required .profileavatar svg {
-  width: 32px;
-  height: 32px;
+.login-required .profileavatar svg { width: 32px; height: 32px; }
+.login-required h2 { max-width: 320px; margin: 0 0 10px; font-size: 23px; line-height: 1.3; }
+.login-required p { max-width: 290px; margin: 0; line-height: 1.7; }
+.login-required > button { width: 100%; max-width: 330px; min-height: 48px; flex-shrink: 0; }
+.parking-details-price { font-size: 13px; line-height: 1.7; }
+.parking-free-now {
+  display: flex; flex-direction: column; gap: 5px;
+  margin: 14px 0 12px; padding: 14px 16px;
+  border: 1px solid #43a879; border-radius: 14px;
+  background: #e6f7ee; color: #075c3b;
 }
-
-.login-required h2 {
-  max-width: 320px;
-  margin: 0 0 10px;
-  font-size: 23px;
-  line-height: 1.3;
-}
-
-.login-required p {
-  max-width: 290px;
-  margin: 0;
-  line-height: 1.7;
-}
-
-.login-required > button {
-  width: 100%;
-  max-width: 330px;
-  min-height: 48px;
-  flex-shrink: 0;
-}
-
-.parking-details-price {
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-#homearea {
-  text-align: left;
-}
-
+.parking-free-now strong { display: flex; align-items: center; gap: 7px; font-size: 17px; letter-spacing: .2px; }
+.parking-free-now strong span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #07885a; color: white; }
+.parking-free-now > span { font-size: 15px; font-weight: 750; line-height: 1.45; }
+.parking-free-now small { color: #39725b; font-size: 12px; line-height: 1.45; }
+html[data-theme="dark"] .parking-free-now { border-color: #318764; background: #123c2d; color: #a7eac7; }
+html[data-theme="dark"] .parking-free-now small { color: #93cdb0; }
+#homearea { text-align: left; }
 @media (max-height: 650px) {
-  #find .parking-toolbar {
-    max-height: 42%;
-  }
-
-  #find .parking-sheet:not(.expanded) #filterDescription {
-    display: none;
-  }
-
-  .scan-viewfinder {
-    min-height: 170px;
-  }
-
-  .login-required {
-    padding-top: 24px;
-  }
+  #find .parking-toolbar { max-height: 42%; }
+  #find .parking-sheet:not(.expanded) #filterDescription { display: none; }
+  .scan-viewfinder { min-height: 170px; }
+  .login-required { padding-top: 24px; }
 }
