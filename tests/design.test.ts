@@ -19,4 +19,6 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('Favorittplasser'));assert.ok(output.includes('Ingen stjernemerkede plasser ennå'));
  assert.ok(output.includes("setParkSmartTheme('system')"));assert.ok(output.includes("setProfileVehicle('MC')"));
  assert.ok(output.includes('resetSignedInPassword()'));
+ assert.ok(output.includes('Personlige opplysninger'));assert.ok(output.includes('Slett konto'));
+ assert.ok(output.includes('profile-action-danger profile-action-soon'));assert.ok(output.includes('type="button" disabled'));
 });
