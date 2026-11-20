@@ -16,11 +16,15 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('submitAuthLogin(event)'));assert.ok(output.includes('submitAuthRegistration(event)'));
  assert.ok(output.includes('toggleAuthPassword'));assert.ok(output.includes('Glemt passord?'));
  assert.ok(!output.includes('Innlogging kommer i en senere versjon.'));
- assert.ok(output.includes('Favorittplasser'));assert.ok(output.includes('Ingen stjernemerkede plasser ennå'));
+ assert.ok(output.includes('Favorittplasser'));assert.ok(output.includes('Ingen favorittplasser funnet'));
  assert.ok(output.includes("setParkSmartTheme('system')"));assert.ok(output.includes("setProfileVehicle('MC')"));
  assert.ok(output.includes('resetSignedInPassword()'));
  assert.ok(output.includes('Personlige opplysninger'));assert.ok(output.includes('Slett konto'));
  assert.ok(output.includes('profile-action-danger profile-action-soon'));assert.ok(output.includes('type="button" disabled'));
  assert.ok(output.includes('favoriteButton(p.id'));assert.ok(output.includes('toggleFavorite'));
- assert.ok(output.includes('favoriteList'));assert.ok(output.includes('parksmart-favorites:'));
+ assert.ok(output.includes('<section id="favorites"'));assert.ok(output.includes('openFavoritesPage()'));
+ assert.ok(output.includes('favoriteSearch'));assert.ok(output.includes('favoriteAreaFilters'));
+ assert.ok(output.includes('toggleFavoriteArea'));assert.ok(output.includes('favoriteBrowseList'));
+ assert.ok(output.includes('favorite-trash'));assert.ok(output.includes('requestFavoriteDelete'));
+ assert.ok(output.includes('Vil du faktisk slette'));assert.ok(output.includes('parksmart-favorites:'));
 });
