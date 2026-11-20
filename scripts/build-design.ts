@@ -8,7 +8,7 @@ const parking = scripts.find(m=>m[1].startsWith('const PARKING_DATA='));
 if (!parking) throw new Error('Missing reference dataset');
 html = html.replace(parking[0], '<script>const PARKING_DATA='+JSON.stringify(designData(dataset)).replace(/</g,'\\u003c')+';</script>');
 html = html.replace("const DATA_DATE='03.11.2026';", "const DATA_DATE="+JSON.stringify(dataset.fetchedAt.slice(0,10))+';');
-html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, authPage());
+html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, authPage()+favoritesPage());
 html = html.replace(/<section id="ai"[\s\S]*?<\/section>/, aiPage());
 // Keep one shared navigation bar as a sibling of every screen.
 html = html.replace(/<div class="nav" data-nav="[^"]+"><\/div>/g, '');
@@ -57,7 +57,7 @@ function syncAppNavigation() {
     ? 'map'
     : ['scan', 'signPreview', 'signResult', 'recognized', 'guideDetail'].includes(screen)
       ? 'guide'
-      : screen;
+      : screen === 'favorites' ? 'profile' : screen;
   document.querySelectorAll('#appNavigation [data-tab]').forEach(button => {
     const active = button.dataset.tab === tab;
     button.classList.toggle('active', active);
@@ -129,9 +129,11 @@ function authPage() {
      <div><small>INNLOGGET SOM</small><h2 id="authUserEmail"></h2></div>
     </div>
     <section class="profile-section" aria-labelledby="favoritesTitle">
-     <div class="profile-section-title"><div><small>DINE STEDER</small><h3 id="favoritesTitle">Favorittplasser</h3></div><span id="favoriteCount" class="profile-coming">0 lagret</span></div>
-     <div id="favoriteEmpty" class="profile-empty"><span aria-hidden="true">☆</span><div><strong>Ingen stjernemerkede plasser ennå</strong><p>Trykk på stjernen i kartet eller på detaljsiden for å lagre en plass her.</p></div></div>
-     <div id="favoriteList" class="favorite-list" aria-live="polite"></div>
+     <button type="button" class="profile-favorites-link" onclick="openFavoritesPage()">
+      <span class="profile-favorites-star" aria-hidden="true">★</span>
+      <span><small>DINE STEDER</small><strong id="favoritesTitle">Favorittplasser</strong><em id="favoriteSummary">Ingen lagrede plasser</em></span>
+      <span><b id="favoriteCount">0</b><i>›</i></span>
+     </button>
     </section>
     <section class="profile-section" aria-labelledby="appearanceTitle">
      <div class="profile-section-title"><div><small>INNSTILLINGER</small><h3 id="appearanceTitle">Utseende</h3></div></div>
@@ -157,6 +159,23 @@ function authPage() {
     </section>
     <p id="authProfileStatus" class="auth-status" role="status" aria-live="polite"></p>
    </div>
+  </div>
+ </section>`;
+}
+function favoritesPage() {
+ return `<section id="favorites" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('profile')" aria-label="Tilbake til profil">‹</button>Favorittplasser</h2></div>
+  <div class="favorites-page">
+   <label class="favorites-search"><span aria-hidden="true">⌕</span><input id="favoriteSearch" type="search" placeholder="Søk i favorittplasser" aria-label="Søk i favorittplasser" oninput="renderFavoritePage()"><button id="favoriteSearchClear" type="button" onclick="clearFavoriteSearch()" aria-label="Tøm søket" hidden>×</button></label>
+   <div id="favoriteAreaFilters" class="favorite-area-filters" role="group" aria-label="Filtrer etter område"></div>
+   <div class="favorites-scroll">
+    <p id="favoritePageCount" class="favorites-result-count" role="status"></p>
+    <div id="favoriteBrowseList" class="favorite-browse-list"></div>
+    <div id="favoritePageEmpty" class="favorites-page-empty" hidden><span aria-hidden="true">☆</span><strong>Ingen favorittplasser funnet</strong><p>Prøv et annet søk eller lagre en plass fra kartet.</p></div>
+   </div>
+  </div>
+  <div id="favoriteDeleteDialog" class="favorite-dialog" role="dialog" aria-modal="true" aria-labelledby="favoriteDeleteTitle" hidden>
+   <div class="favorite-dialog-card"><div class="favorite-dialog-icon" aria-hidden="true">!</div><h3 id="favoriteDeleteTitle">Slette favoritt?</h3><p id="favoriteDeleteText">Vil du faktisk slette denne plassen fra favorittene?</p><div class="row"><button class="btn outline" type="button" onclick="cancelFavoriteDelete()">Avbryt</button><button class="btn favorite-confirm-delete" type="button" onclick="confirmFavoriteDelete()">Slett</button></div></div>
   </div>
  </section>`;
 }
