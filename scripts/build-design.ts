@@ -95,9 +95,6 @@ await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
-function loginPage(id:string,title:string,heading:string,description:string) {
- return `<section id="${id}" class="screen"><div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>${title}</h2></div><div class="scroll login-required"><div class="profileavatar" aria-hidden="true">${navIcon(id)}</div><h2>${heading}</h2><p class="muted">${description}</p><button class="btn" style="margin-top:28px" onclick="alert('Innlogging kommer i en senere versjon.')">Logg inn</button><button class="pill" style="margin-top:12px" onclick="go('find')">Fortsett uten innlogging</button></div></section>`;
-}
 function authPage() {
  return `<section id="profile" class="screen">
   <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>Min profil</h2></div>
