@@ -4,7 +4,8 @@
   const system = window.matchMedia('(prefers-color-scheme: dark)');
   let saved;
   try { saved = window.localStorage.getItem(key); } catch {}
-  let dark = saved === 'dark' || (saved !== 'light' && system.matches);
+  let mode = ['light', 'dark', 'system'].includes(saved) ? saved : 'system';
+  let dark = mode === 'dark' || (mode === 'system' && system.matches);
   const buttons = [];
   const style = document.createElement('style');
   style.textContent = `
@@ -55,25 +56,36 @@
   document.head.appendChild(style);
 
   function apply() {
+    dark = mode === 'dark' || (mode === 'system' && system.matches);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.documentElement.dataset.themeMode = mode;
     buttons.forEach(button => {
       button.textContent = dark ? '☀ Lys modus' : '☾ Mørk modus';
       button.setAttribute('aria-label', dark ? 'Bytt til lys modus' : 'Bytt til mørk modus');
+    });
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+      const selected = button.dataset.themeChoice === mode;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
     });
     const packet = { type: 'theme', theme: dark ? 'dark' : 'light' };
     if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(packet));
     else if (window.parent !== window) window.parent.postMessage({ channel: 'parksmart:request', payload: packet }, '*');
   }
 
+  window.setParkSmartTheme = next => {
+    if (!['light', 'dark', 'system'].includes(next)) return;
+    mode = next;
+    try { window.localStorage.setItem(key, mode); } catch {}
+    apply();
+  };
+
   function button() {
     const element = document.createElement('button');
     element.type = 'button';
     element.className = 'pill theme-toggle';
     element.addEventListener('click', () => {
-      dark = !dark;
-      saved = dark ? 'dark' : 'light';
-      try { window.localStorage.setItem(key, saved); } catch {}
-      apply();
+      window.setParkSmartTheme(dark ? 'light' : 'dark');
     });
     buttons.push(element);
     return element;
@@ -84,9 +96,6 @@
     if (notification) notification.replaceWith(button());
     else homeHeader.appendChild(button());
   }
-  document.querySelector('#profile .login-required')?.appendChild(button());
-  system.addEventListener('change', event => {
-    if (saved !== 'dark' && saved !== 'light') { dark = event.matches; apply(); }
-  });
+  system.addEventListener('change', () => { if (mode === 'system') apply(); });
   apply();
 })();
