@@ -8,8 +8,8 @@ const parking = scripts.find(m=>m[1].startsWith('const PARKING_DATA='));
 if (!parking) throw new Error('Missing reference dataset');
 html = html.replace(parking[0], '<script>const PARKING_DATA='+JSON.stringify(designData(dataset)).replace(/</g,'\\u003c')+';</script>');
 html = html.replace("const DATA_DATE='03.11.2026';", "const DATA_DATE="+JSON.stringify(dataset.fetchedAt.slice(0,10))+';');
-html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, loginPage('profile','Min profil','Logg inn for å se profilen din','Dine parkeringer, kjøretøy og favoritter samles her.'));
-html = html.replace(/<section id="ai"[\s\S]*?<\/section>/,loginPage('ai','✦ ParkSmart AI','Logg inn for AI-søk','Din parkeringsassistent kommer her.'));
+html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, authPage()+favoritesPage());
+html = html.replace(/<section id="ai"[\s\S]*?<\/section>/, aiPage());
 // Keep one shared navigation bar as a sibling of every screen.
 html = html.replace(/<div class="nav" data-nav="[^"]+"><\/div>/g, '');
 const phoneEnd = /(<\/section>\s*)<\/div>(?=<script>)/;
@@ -32,12 +32,35 @@ html = html.replace('<div id="addressStatus"', '<div class="parking-controls"><l
 html = html.replace('<button class="pill" data-filter="Parkeringshus"', '<button class="pill" data-filter="Betaling" onclick="filter(this)">Betaling</button><button class="pill" data-filter="HC" onclick="filter(this)">HC</button><button class="pill" data-filter="Lading" onclick="filter(this)">Lading</button><button class="pill" data-filter="Parkeringshus"');
 html = html.replace(/<details class="parking-sources">[\s\S]*?<\/details>/, '<details class="parking-sources"><summary>Kartdata og vilkår · '+dataset.fetchedAt.slice(0,10)+'</summary><p>Oslo kommune og Statens vegvesen. Kartbakgrunn: Kartverket. Markører viser steder og strekninger, ikke ledighet. HC/lading kan vise egenskaper ved hele områder. Næradresser er omtrentlige. Skiltingen på stedet gjelder.</p><p>Avgiftsfrie plasser i registeret bekrefter ikke fri tilgang. Prisavvik gir ukjent tidsstatus. <button class="pill" onclick="refreshAppData()">Oppdater data</button></p></details>');
 html = html.replace(/(<button class="feature" onclick=")go\('find'\)("><span class="symbol">🔎)/, "$1go('ai')$2");
-const css = '<style>'+await readFile('src/design/app.css','utf8')+'</style>';
+// Leaflet auto-pans when a popup is close to the edge. That movement used to
+// trigger drawParking(), which cleared the marker layer and immediately closed
+// the popup. Keep the current layer while a popup is open; normal map movement
+// redraws again after the popup is closed.
+html = html.replace(
+  "parkingMap.on('moveend',drawParking);",
+  `let parkingDrawPending=false;
+ parkingMap.on('movestart',()=>{parkingDrawPending=true;});
+ parkingMap.on('moveend',()=>{
+  const popupOpen=parkingMap._popup&&parkingMap.hasLayer(parkingMap._popup);
+  if(popupOpen)return;
+  parkingDrawPending=false;
+  drawParking();
+ });
+ parkingMap.on('popupclose',()=>{
+  if(!parkingDrawPending)return;
+  parkingDrawPending=false;
+  requestAnimationFrame(drawParking);
+ });`
+);
+const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
 const bridge = await readFile('src/design/bridge.js','utf8');
 const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
 const theme = await readFile('src/design/theme.js','utf8');
+const auth = await readFile('src/design/auth.js','utf8');
+const favorites = await readFile('src/design/favorites.js','utf8');
+const ai = await readFile('src/design/ai.js','utf8');
 // Keep navigation working with both the previous and updated bridge.js.
 const navigationBridge = `
 function syncAppNavigation() {
@@ -46,7 +69,7 @@ function syncAppNavigation() {
     ? 'map'
     : ['scan', 'signPreview', 'signResult', 'recognized', 'guideDetail'].includes(screen)
       ? 'guide'
-      : screen;
+      : screen === 'favorites' ? 'profile' : screen;
   document.querySelectorAll('#appNavigation [data-tab]').forEach(button => {
     const active = button.dataset.tab === tab;
     button.classList.toggle('active', active);
@@ -80,13 +103,120 @@ if (parkingSheetForListButton) {
 syncParkingListButton();
 go('home');
 `;
-html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'</script></body>');
+html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+auth+'\n'+favorites+'\n'+ai+'</script></body>');
 await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
-function loginPage(id:string,title:string,heading:string,description:string) {
- return `<section id="${id}" class="screen"><div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>${title}</h2></div><div class="scroll login-required"><div class="profileavatar" aria-hidden="true">${navIcon(id)}</div><h2>${heading}</h2><p class="muted">${description}</p><button class="btn" style="margin-top:28px" onclick="alert('Innlogging kommer i en senere versjon.')">Logg inn</button><button class="pill" style="margin-top:12px" onclick="go('find')">Fortsett uten innlogging</button></div></section>`;
+function authPage() {
+ return `<section id="profile" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>Min profil</h2></div>
+  <div class="scroll auth-page">
+   <div id="authSignedOut" class="auth-card">
+    <div class="auth-brand" aria-hidden="true">P</div>
+    <h2>Velkommen til ParkSmart</h2>
+    <p class="muted">Logg inn for å lagre favoritter og parkeringsvalg.</p>
+    <div class="auth-tabs" role="tablist" aria-label="Innlogging eller registrering">
+     <button id="authLoginTab" type="button" role="tab" aria-selected="true" onclick="setAuthMode('login')">Logg inn</button>
+     <button id="authRegisterTab" type="button" role="tab" aria-selected="false" onclick="setAuthMode('register')">Registrer deg</button>
+    </div>
+    <form id="authLoginForm" class="auth-form" onsubmit="submitAuthLogin(event)">
+     <label>E-post<input id="authLoginEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="254" placeholder="navn@epost.no" required></label>
+     <label>Passord<span class="auth-password"><input id="authLoginPassword" type="password" autocomplete="current-password" placeholder="Passord" required><button type="button" onclick="toggleAuthPassword('authLoginPassword',this)" aria-label="Vis passord">Vis</button></span></label>
+     <button class="btn auth-submit" type="submit">Logg inn</button>
+     <button class="auth-link" type="button" onclick="requestPasswordReset()">Glemt passord?</button>
+    </form>
+    <form id="authRegisterForm" class="auth-form" onsubmit="submitAuthRegistration(event)" hidden>
+     <label>E-post<input id="authRegisterEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="254" placeholder="navn@epost.no" required></label>
+     <label>Passord<span class="auth-password"><input id="authRegisterPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Minst 6 tegn" required><button type="button" onclick="toggleAuthPassword('authRegisterPassword',this)" aria-label="Vis passord">Vis</button></span></label>
+     <label>Gjenta passord<span class="auth-password"><input id="authRegisterConfirm" type="password" autocomplete="new-password" minlength="6" placeholder="Skriv passordet igjen" required><button type="button" onclick="toggleAuthPassword('authRegisterConfirm',this)" aria-label="Vis passord">Vis</button></span></label>
+     <small class="auth-hint">Passordet må ha minst 6 tegn.</small>
+     <button class="btn auth-submit" type="submit">Opprett konto</button>
+    </form>
+    <p id="authStatus" class="auth-status" role="status" aria-live="polite"></p>
+   </div>
+   <div id="authSignedIn" class="auth-card auth-profile" hidden>
+    <div class="profile-account">
+     <div class="profileavatar" aria-hidden="true">${navIcon('profile')}</div>
+     <div><small>INNLOGGET SOM</small><h2 id="authUserEmail"></h2></div>
+    </div>
+    <section class="profile-section" aria-labelledby="favoritesTitle">
+     <button type="button" class="profile-favorites-link" onclick="openFavoritesPage()">
+      <span class="profile-favorites-star" aria-hidden="true">★</span>
+      <span><small>DINE STEDER</small><strong id="favoritesTitle">Favorittplasser</strong><em id="favoriteSummary">Ingen lagrede plasser</em></span>
+      <span><b id="favoriteCount">0</b><i>›</i></span>
+     </button>
+    </section>
+    <section class="profile-section" aria-labelledby="appearanceTitle">
+     <div class="profile-section-title"><div><small>INNSTILLINGER</small><h3 id="appearanceTitle">Utseende</h3></div></div>
+     <p class="profile-setting-label">Fargetema</p>
+     <div class="profile-segments" role="group" aria-label="Velg fargetema">
+      <button type="button" data-theme-choice="system" onclick="setParkSmartTheme('system')">Automatisk</button>
+      <button type="button" data-theme-choice="light" onclick="setParkSmartTheme('light')">Lys</button>
+      <button type="button" data-theme-choice="dark" onclick="setParkSmartTheme('dark')">Mørk</button>
+     </div>
+     <p class="profile-setting-help">Automatisk følger innstillingen på telefonen.</p>
+     <p class="profile-setting-label">Standard kjøretøy</p>
+     <div class="profile-segments profile-vehicle-choice" role="group" aria-label="Velg standard kjøretøy">
+      <button type="button" data-profile-vehicle="Bil" onclick="setProfileVehicle('Bil')">🚘 Bil</button>
+      <button type="button" data-profile-vehicle="MC" onclick="setProfileVehicle('MC')">🏍 MC</button>
+     </div>
+    </section>
+    <section class="profile-section" aria-labelledby="accountTitle">
+     <div class="profile-section-title"><div><small>SIKKERHET</small><h3 id="accountTitle">Konto</h3></div></div>
+     <button class="profile-action profile-action-soon" type="button" disabled><span>♙</span><span><strong>Personlige opplysninger</strong><small>Navn, kontaktinformasjon og kontodetaljer</small></span><em>Kommer snart</em></button>
+     <button class="profile-action" type="button" onclick="resetSignedInPassword()"><span>✉</span><span><strong>Endre passord</strong><small>Få tilsendt en sikker lenke på e-post</small></span><b>›</b></button>
+     <button class="profile-action profile-action-danger profile-action-soon" type="button" disabled><span>×</span><span><strong>Slett konto</strong><small>Slett kontoen og tilknyttede data permanent</small></span><em>Kommer snart</em></button>
+     <button class="btn outline profile-logout" type="button" onclick="logoutParkSmart()">Logg ut</button>
+    </section>
+    <p id="authProfileStatus" class="auth-status" role="status" aria-live="polite"></p>
+   </div>
+  </div>
+ </section>`;
+}
+function favoritesPage() {
+ return `<section id="favorites" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('profile')" aria-label="Tilbake til profil">‹</button>Favorittplasser</h2></div>
+  <div class="favorites-page">
+   <label class="favorites-search"><span aria-hidden="true">⌕</span><input id="favoriteSearch" type="search" placeholder="Søk i favorittplasser" aria-label="Søk i favorittplasser" oninput="renderFavoritePage()"><button id="favoriteSearchClear" type="button" onclick="clearFavoriteSearch()" aria-label="Tøm søket" hidden>×</button></label>
+   <div id="favoriteAreaFilters" class="favorite-area-filters" role="group" aria-label="Filtrer etter område"></div>
+   <div class="favorites-scroll">
+    <p id="favoritePageCount" class="favorites-result-count" role="status"></p>
+    <div id="favoriteBrowseList" class="favorite-browse-list"></div>
+    <div id="favoritePageEmpty" class="favorites-page-empty" hidden><span aria-hidden="true">☆</span><strong>Ingen favorittplasser funnet</strong><p>Prøv et annet søk eller lagre en plass fra kartet.</p></div>
+   </div>
+  </div>
+  <div id="favoriteDeleteDialog" class="favorite-dialog" role="dialog" aria-modal="true" aria-labelledby="favoriteDeleteTitle" hidden>
+   <div class="favorite-dialog-card"><div class="favorite-dialog-icon" aria-hidden="true">!</div><h3 id="favoriteDeleteTitle">Slette favoritt?</h3><p id="favoriteDeleteText">Vil du faktisk slette denne plassen fra favorittene?</p><div class="row"><button class="btn outline" type="button" onclick="cancelFavoriteDelete()">Avbryt</button><button class="btn favorite-confirm-delete" type="button" onclick="confirmFavoriteDelete()">Slett</button></div></div>
+  </div>
+ </section>`;
+}
+function aiPage() {
+ return `<section id="ai" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button><span>✦ ParkSmart AI</span></h2></div>
+  <div class="ai-page">
+   <div id="aiMessages" class="ai-messages" role="log" aria-live="polite" aria-label="Samtale med ParkSmart AI">
+    <div class="ai-message ai-message-assistant"><div class="ai-avatar" aria-hidden="true">✦</div><div class="ai-bubble"><strong>Hei! Hva kan jeg hjelpe deg med?</strong><p>Spør om parkering i Oslo, finn en plass i nærheten eller ta bilde av et parkeringsskilt.</p></div></div>
+   </div>
+   <div id="aiSuggestions" class="ai-suggestions" aria-label="Forslag">
+    <button type="button" onclick="askAiSuggestion('Hvor er nærmeste gratis parkering?')">Nærmeste gratis</button>
+    <button type="button" onclick="askAiSuggestion('Finn nærmeste MC-parkering')">MC-parkering</button>
+    <button type="button" onclick="askAiSuggestion('Finn parkering med lading i nærheten')">Lading</button>
+    <button type="button" onclick="pickAiPhoto(true)">📷 Tolk et skilt</button>
+   </div>
+   <div id="aiPhoto" class="ai-photo" hidden>
+    <img id="aiPhotoImage" alt="Valgt parkeringsskilt">
+    <div><strong>Bilde klart</strong><small>Send et spørsmål for å analysere skiltet.</small></div>
+    <button type="button" onclick="removeAiPhoto()" aria-label="Fjern bildet">×</button>
+   </div>
+   <form class="ai-composer" onsubmit="submitAiQuestion(event)">
+    <button class="ai-camera" type="button" onclick="pickAiPhoto(true)" aria-label="Ta bilde av skilt">📷</button>
+    <textarea id="aiInput" rows="1" maxlength="500" placeholder="Spør om parkering …" aria-label="Spør ParkSmart AI"></textarea>
+    <button id="aiSend" class="ai-send" type="submit" aria-label="Send spørsmål">➤</button>
+   </form>
+   <p class="ai-disclaimer">Kontroller alltid skiltene på stedet. Midlertidig skilting kan overstyre informasjonen i appen.</p>
+  </div>
+ </section>`;
 }
 function navIcon(id: string) {
  const paths: Record<string, string> = {

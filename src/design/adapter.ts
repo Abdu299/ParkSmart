@@ -14,6 +14,9 @@ export function designData(dataset: Dataset, now = new Date()) {
       address: p.address, approximate: p.addressApproximate, fetchedAt: p.fetchedAt, operator: p.operator,
       source: p.source === 'oslo' ? 'Oslo kommune' : 'Statens vegvesen', url: p.sourceUrl,
       status: status.label, statusDetail: status.detail, isFreeNow: status.isFreeNow, forbidden: status.forbidden,
+      freeUntil: status.nextFeeAt ? new Intl.DateTimeFormat('nb-NO', {
+        weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Oslo',
+      }).format(status.nextFeeAt) : undefined,
       after20: (p.facility === 'mc' && status.isFreeNow === true) || (p.source === 'oslo' && t?.quality === 'consistent' && [2020,2200,2240,2260,2300,2310,2600,2650,2700,2850,2880,2960].includes(t.id) && !p.nightBan && !p.notes && /20:00/.test(t.hours) && p.facility === 'street'),
     };
   });

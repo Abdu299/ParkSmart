@@ -93,6 +93,12 @@ export function ParkingProvider({ children }: { children: ReactNode }) {
       if (alive.current) setProgress(`Kunne ikke oppdatere. Viser lagret uttrekk. ${error instanceof Error ? error.message : ''}`);
     } finally { busy.current = false; if (alive.current) setRefreshing(false); }
   }, [data]);
+  useEffect(() => {
+    const age = Date.now() - new Date(data.fetchedAt).getTime();
+    if (!Number.isFinite(age) || age <= 6 * 3600000) return;
+    const timer = setTimeout(() => { void refresh(); }, 1200);
+    return () => clearTimeout(timer);
+  }, [data.fetchedAt, refresh]);
   return <ParkingContext.Provider value={{ data, preferences, setPreferences, refreshing, progress, refresh, updateParking }}>{children}</ParkingContext.Provider>;
 }
 
