@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useParking } from '../state/ParkingProvider';
 import { searchAddresses } from '../services/data';
 import { designData } from './adapter';
+import { authErrorMessage, firebaseConfigured, loginWithEmail, logoutUser, observeAuth, registerWithEmail, resetPassword } from '../services/firebase';
 
 const AI_ENDPOINT = process.env.EXPO_PUBLIC_PARKSMART_AI_URL?.trim();
 
@@ -18,6 +19,8 @@ export function useDesignBridge(send: (packet: unknown) => void) {
   const picking = useRef(false);
   const locating = useRef(false);
   const searchVersion = useRef(0);
+  const authBusy = useRef(false);
+  const authUser = useRef<{uid:string;email:string}|null>(null);
   const allowedHosts = ['www.google.com','www.oslo.kommune.no','geodata.bymoslo.no','parkreg-open.atlas.vegvesen.no','www.vegvesen.no','lovdata.no','www.kartverket.no'];
   const publish = useCallback(() => {
     if (!ready.current) return;
@@ -29,9 +32,17 @@ export function useDesignBridge(send: (packet: unknown) => void) {
   useEffect(() => { publish(); },[publish]);
   useEffect(() => { if(progress&&ready.current) send({type:'progress',message:progress}); },[progress,send]);
   useEffect(() => {const timer=setInterval(publish,60000);return()=>clearInterval(timer);},[publish]);
+  const publishAuth = useCallback(() => {
+    if (!ready.current) return;
+    send({type:'authState',configured:firebaseConfigured,user:authUser.current});
+  },[send]);
+  useEffect(() => observeAuth(user => {
+    authUser.current=user?{uid:user.uid,email:user.email||''}:null;
+    publishAuth();
+  }),[publishAuth]);
   const handle = async (packet: Record<string,unknown>) => {
     if(packet.type==='theme'&&(packet.theme==='light'||packet.theme==='dark')){setActiveTheme(packet.theme);return;}
-    if(packet.type==='ready'){ready.current=true;publish();return;}
+    if(packet.type==='ready'){ready.current=true;publish();publishAuth();return;}
     if(packet.type==='screen'){if(typeof packet.screen==='string'){screen.current=packet.screen;setActiveScreen(packet.screen);}return;}
     if(packet.type==='refresh'){await refresh();return;}
     if(packet.type==='locate'){
@@ -57,6 +68,25 @@ export function useDesignBridge(send: (packet: unknown) => void) {
     }
     if(packet.type==='external'&&typeof packet.url==='string'){
       try{const url=new URL(packet.url);if(url.protocol==='https:'&&allowedHosts.includes(url.hostname))await Linking.openURL(url.toString());}catch{}return;
+    }
+    if(packet.type==='authLogin'||packet.type==='authRegister'||packet.type==='authReset'||packet.type==='authLogout'){
+      if(authBusy.current)return;
+      const email=typeof packet.email==='string'?packet.email.trim().toLowerCase().slice(0,254):'';
+      const password=typeof packet.password==='string'?packet.password.slice(0,4096):'';
+      if(!firebaseConfigured){send({type:'authError',message:'Firebase er ikke konfigurert ennå. Legg Firebase-verdiene i .env og start Expo på nytt.'});return;}
+      if(packet.type!=='authLogout'&&!email){send({type:'authError',message:'Skriv inn e-postadressen din.'});return;}
+      if((packet.type==='authLogin'||packet.type==='authRegister')&&!password){send({type:'authError',message:'Skriv inn passordet ditt.'});return;}
+      if(packet.type==='authRegister'&&password.length<6){send({type:'authError',message:'Passordet må ha minst 6 tegn.'});return;}
+      authBusy.current=true;send({type:'authBusy',value:true});
+      try{
+        if(packet.type==='authLogin')await loginWithEmail(email,password);
+        if(packet.type==='authRegister')await registerWithEmail(email,password);
+        if(packet.type==='authReset'){await resetPassword(email);send({type:'authMessage',message:'Vi har sendt en lenke for å lage nytt passord, hvis e-posten tilhører en konto.'});}
+        if(packet.type==='authLogout')await logoutUser();
+        if(packet.type!=='authReset')send({type:'authSuccess',action:packet.type});
+      }catch(error){send({type:'authError',message:authErrorMessage(error)});}
+      finally{authBusy.current=false;send({type:'authBusy',value:false});}
+      return;
     }
     if(packet.type==='aiAsk'){
       const requestId=typeof packet.requestId==='string'?packet.requestId.slice(0,100):'ai';

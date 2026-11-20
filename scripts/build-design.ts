@@ -8,7 +8,7 @@ const parking = scripts.find(m=>m[1].startsWith('const PARKING_DATA='));
 if (!parking) throw new Error('Missing reference dataset');
 html = html.replace(parking[0], '<script>const PARKING_DATA='+JSON.stringify(designData(dataset)).replace(/</g,'\\u003c')+';</script>');
 html = html.replace("const DATA_DATE='03.11.2026';", "const DATA_DATE="+JSON.stringify(dataset.fetchedAt.slice(0,10))+';');
-html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, loginPage('profile','Min profil','Logg inn for å se profilen din','Dine parkeringer, kjøretøy og favoritter samles her.'));
+html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, authPage());
 html = html.replace(/<section id="ai"[\s\S]*?<\/section>/, aiPage());
 // Keep one shared navigation bar as a sibling of every screen.
 html = html.replace(/<div class="nav" data-nav="[^"]+"><\/div>/g, '');
@@ -46,6 +46,7 @@ const bridge = await readFile('src/design/bridge.js','utf8');
 const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
 const theme = await readFile('src/design/theme.js','utf8');
+const auth = await readFile('src/design/auth.js','utf8');
 const ai = await readFile('src/design/ai.js','utf8');
 // Keep navigation working with both the previous and updated bridge.js.
 const navigationBridge = `
@@ -89,13 +90,51 @@ if (parkingSheetForListButton) {
 syncParkingListButton();
 go('home');
 `;
-html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+ai+'</script></body>');
+html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+auth+'\n'+ai+'</script></body>');
 await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
 function loginPage(id:string,title:string,heading:string,description:string) {
  return `<section id="${id}" class="screen"><div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>${title}</h2></div><div class="scroll login-required"><div class="profileavatar" aria-hidden="true">${navIcon(id)}</div><h2>${heading}</h2><p class="muted">${description}</p><button class="btn" style="margin-top:28px" onclick="alert('Innlogging kommer i en senere versjon.')">Logg inn</button><button class="pill" style="margin-top:12px" onclick="go('find')">Fortsett uten innlogging</button></div></section>`;
+}
+function authPage() {
+ return `<section id="profile" class="screen">
+  <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>Min profil</h2></div>
+  <div class="scroll auth-page">
+   <div id="authSignedOut" class="auth-card">
+    <div class="auth-brand" aria-hidden="true">P</div>
+    <h2>Velkommen til ParkSmart</h2>
+    <p class="muted">Logg inn for å lagre favoritter og parkeringsvalg.</p>
+    <div class="auth-tabs" role="tablist" aria-label="Innlogging eller registrering">
+     <button id="authLoginTab" type="button" role="tab" aria-selected="true" onclick="setAuthMode('login')">Logg inn</button>
+     <button id="authRegisterTab" type="button" role="tab" aria-selected="false" onclick="setAuthMode('register')">Registrer deg</button>
+    </div>
+    <form id="authLoginForm" class="auth-form" onsubmit="submitAuthLogin(event)">
+     <label>E-post<input id="authLoginEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="254" placeholder="navn@epost.no" required></label>
+     <label>Passord<span class="auth-password"><input id="authLoginPassword" type="password" autocomplete="current-password" placeholder="Passord" required><button type="button" onclick="toggleAuthPassword('authLoginPassword',this)" aria-label="Vis passord">Vis</button></span></label>
+     <button class="btn auth-submit" type="submit">Logg inn</button>
+     <button class="auth-link" type="button" onclick="requestPasswordReset()">Glemt passord?</button>
+    </form>
+    <form id="authRegisterForm" class="auth-form" onsubmit="submitAuthRegistration(event)" hidden>
+     <label>E-post<input id="authRegisterEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="254" placeholder="navn@epost.no" required></label>
+     <label>Passord<span class="auth-password"><input id="authRegisterPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Minst 6 tegn" required><button type="button" onclick="toggleAuthPassword('authRegisterPassword',this)" aria-label="Vis passord">Vis</button></span></label>
+     <label>Gjenta passord<span class="auth-password"><input id="authRegisterConfirm" type="password" autocomplete="new-password" minlength="6" placeholder="Skriv passordet igjen" required><button type="button" onclick="toggleAuthPassword('authRegisterConfirm',this)" aria-label="Vis passord">Vis</button></span></label>
+     <small class="auth-hint">Passordet må ha minst 6 tegn.</small>
+     <button class="btn auth-submit" type="submit">Opprett konto</button>
+    </form>
+    <p id="authStatus" class="auth-status" role="status" aria-live="polite"></p>
+   </div>
+   <div id="authSignedIn" class="auth-card auth-profile" hidden>
+    <div class="profileavatar" aria-hidden="true">${navIcon('profile')}</div>
+    <small>INNLOGGET SOM</small>
+    <h2 id="authUserEmail"></h2>
+    <p class="muted">Kontoen din er klar. Favoritter og flere profilfunksjoner kommer i neste versjon.</p>
+    <button class="btn outline" type="button" onclick="logoutParkSmart()">Logg ut</button>
+    <p id="authProfileStatus" class="auth-status" role="status" aria-live="polite"></p>
+   </div>
+  </div>
+ </section>`;
 }
 function aiPage() {
  return `<section id="ai" class="screen">
