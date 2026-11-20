@@ -248,6 +248,10 @@ html, body {
 .profile-action strong { margin-bottom: 3px; font-size: 13px; }
 .profile-action small { color: #6b8190; font-size: 10px; line-height: 1.4; }
 .profile-action b { color: #7890a2; font-size: 22px; }
+.profile-action em { padding: 4px 7px; border-radius: 999px; background: #edf2f6; color: #6b8190; font-size: 9px; font-style: normal; font-weight: 800; white-space: nowrap; }
+.profile-action-soon:disabled { opacity: 1; cursor: default; }
+.profile-action-danger strong { color: #a52e35; }
+.profile-action-danger > span:first-child { background: #ffeaeb; color: #b62d36; font-size: 23px; }
 .auth-profile .profile-logout { width: 100%; margin-top: 14px; }
 .auth-profile > .auth-status { margin-top: 0 !important; text-align: center; }
 html[data-theme="dark"] .auth-page { background: linear-gradient(180deg, #101f2c 0%, #101820 55%); }
@@ -271,6 +275,9 @@ html[data-theme="dark"] .profile-segments button { color: #abbecd; }
 html[data-theme="dark"] .profile-segments button.selected { background: #263e57; color: #a8ccff; box-shadow: none; }
 html[data-theme="dark"] .profile-action { border-color: #304253; color: #e5edf5; }
 html[data-theme="dark"] .profile-action > span:first-child { background: #233c5b; color: #a8ccff; }
+html[data-theme="dark"] .profile-action em { background: #26333e; color: #abbecd; }
+html[data-theme="dark"] .profile-action-danger strong { color: #ff9ea4; }
+html[data-theme="dark"] .profile-action-danger > span:first-child { background: #46262b; color: #ff9ea4; }
 .parking-details-price { font-size: 13px; line-height: 1.7; }
 .parking-free-now {
   display: flex; flex-direction: column; gap: 5px;
