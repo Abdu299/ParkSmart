@@ -47,6 +47,7 @@ const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
 const theme = await readFile('src/design/theme.js','utf8');
 const auth = await readFile('src/design/auth.js','utf8');
+const favorites = await readFile('src/design/favorites.js','utf8');
 const ai = await readFile('src/design/ai.js','utf8');
 // Keep navigation working with both the previous and updated bridge.js.
 const navigationBridge = `
@@ -90,7 +91,7 @@ if (parkingSheetForListButton) {
 syncParkingListButton();
 go('home');
 `;
-html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+auth+'\n'+ai+'</script></body>');
+html = html.replace('</head>',css+'</head>').replace('</body>','<script>'+bridge+'\n'+navigationBridge+'\n'+search+'\n'+mapControls+'\n'+theme+'\n'+auth+'\n'+favorites+'\n'+ai+'</script></body>');
 await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
@@ -128,8 +129,9 @@ function authPage() {
      <div><small>INNLOGGET SOM</small><h2 id="authUserEmail"></h2></div>
     </div>
     <section class="profile-section" aria-labelledby="favoritesTitle">
-     <div class="profile-section-title"><div><small>DINE STEDER</small><h3 id="favoritesTitle">Favorittplasser</h3></div><span class="profile-coming">Kommer snart</span></div>
-     <div class="profile-empty"><span aria-hidden="true">☆</span><div><strong>Ingen stjernemerkede plasser ennå</strong><p>Senere kan du trykke på stjernen ved en parkeringsplass for å lagre den her.</p></div></div>
+     <div class="profile-section-title"><div><small>DINE STEDER</small><h3 id="favoritesTitle">Favorittplasser</h3></div><span id="favoriteCount" class="profile-coming">0 lagret</span></div>
+     <div id="favoriteEmpty" class="profile-empty"><span aria-hidden="true">☆</span><div><strong>Ingen stjernemerkede plasser ennå</strong><p>Trykk på stjernen i kartet eller på detaljsiden for å lagre en plass her.</p></div></div>
+     <div id="favoriteList" class="favorite-list" aria-live="polite"></div>
     </section>
     <section class="profile-section" aria-labelledby="appearanceTitle">
      <div class="profile-section-title"><div><small>INNSTILLINGER</small><h3 id="appearanceTitle">Utseende</h3></div></div>
