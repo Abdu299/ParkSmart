@@ -38,7 +38,19 @@ html = html.replace(/(<button class="feature" onclick=")go\('find'\)("><span cla
 // redraws again after the popup is closed.
 html = html.replace(
   "parkingMap.on('moveend',drawParking);",
-  "parkingMap.on('moveend',()=>{if(!parkingMap._popup)drawParking();});"
+  `let parkingDrawPending=false;
+ parkingMap.on('movestart',()=>{parkingDrawPending=true;});
+ parkingMap.on('moveend',()=>{
+  const popupOpen=parkingMap._popup&&parkingMap.hasLayer(parkingMap._popup);
+  if(popupOpen)return;
+  parkingDrawPending=false;
+  drawParking();
+ });
+ parkingMap.on('popupclose',()=>{
+  if(!parkingDrawPending)return;
+  parkingDrawPending=false;
+  requestAnimationFrame(drawParking);
+ });`
 );
 const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
