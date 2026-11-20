@@ -2,6 +2,8 @@
 (() => {
   let mode = 'login';
   let busy = false;
+  let currentEmail = '';
+  const vehicleKey = 'parksmart-default-vehicle';
 
   const byId = id => document.getElementById(id);
   const status = (message, error = false) => {
@@ -64,17 +66,33 @@
   };
 
   window.logoutParkSmart = () => { if (!busy) nativeSend({ type: 'authLogout' }); };
+  window.resetSignedInPassword = () => {
+    if (!busy && currentEmail) nativeSend({ type: 'authReset', email: currentEmail });
+  };
+
+  window.setProfileVehicle = value => {
+    if (!['Bil', 'MC'].includes(value)) return;
+    try { window.localStorage.setItem(vehicleKey, value); } catch {}
+    document.querySelectorAll('[data-profile-vehicle]').forEach(button => {
+      const selected = button.dataset.profileVehicle === value;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    if (typeof window.changeVehicle === 'function') window.changeVehicle(value);
+  };
 
   function receiveState(packet) {
     const signedIn = !!packet.user;
     byId('authSignedOut').hidden = signedIn;
     byId('authSignedIn').hidden = !signedIn;
     if (signedIn) {
-      byId('authUserEmail').textContent = packet.user.email || 'ParkSmart-bruker';
+      currentEmail = packet.user.email || '';
+      byId('authUserEmail').textContent = currentEmail || 'ParkSmart-bruker';
       status('');
     } else if (packet.configured === false) {
+      currentEmail = '';
       status('Firebase må konfigureres før innlogging kan brukes.', true);
-    }
+    } else currentEmail = '';
   }
 
   const previousReceive = window.ParkSmartNative.receive;
@@ -86,4 +104,8 @@
     if (packet.type === 'authSuccess') { status(''); return; }
     previousReceive(packet);
   };
+
+  let savedVehicle = 'Bil';
+  try { savedVehicle = window.localStorage.getItem(vehicleKey) || 'Bil'; } catch {}
+  window.setProfileVehicle(savedVehicle === 'MC' ? 'MC' : 'Bil');
 })();
