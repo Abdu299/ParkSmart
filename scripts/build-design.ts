@@ -32,6 +32,14 @@ html = html.replace('<div id="addressStatus"', '<div class="parking-controls"><l
 html = html.replace('<button class="pill" data-filter="Parkeringshus"', '<button class="pill" data-filter="Betaling" onclick="filter(this)">Betaling</button><button class="pill" data-filter="HC" onclick="filter(this)">HC</button><button class="pill" data-filter="Lading" onclick="filter(this)">Lading</button><button class="pill" data-filter="Parkeringshus"');
 html = html.replace(/<details class="parking-sources">[\s\S]*?<\/details>/, '<details class="parking-sources"><summary>Kartdata og vilkår · '+dataset.fetchedAt.slice(0,10)+'</summary><p>Oslo kommune og Statens vegvesen. Kartbakgrunn: Kartverket. Markører viser steder og strekninger, ikke ledighet. HC/lading kan vise egenskaper ved hele områder. Næradresser er omtrentlige. Skiltingen på stedet gjelder.</p><p>Avgiftsfrie plasser i registeret bekrefter ikke fri tilgang. Prisavvik gir ukjent tidsstatus. <button class="pill" onclick="refreshAppData()">Oppdater data</button></p></details>');
 html = html.replace(/(<button class="feature" onclick=")go\('find'\)("><span class="symbol">🔎)/, "$1go('ai')$2");
+// Leaflet auto-pans when a popup is close to the edge. That movement used to
+// trigger drawParking(), which cleared the marker layer and immediately closed
+// the popup. Keep the current layer while a popup is open; normal map movement
+// redraws again after the popup is closed.
+html = html.replace(
+  "parkingMap.on('moveend',drawParking);",
+  "parkingMap.on('moveend',()=>{if(!parkingMap._popup)drawParking();});"
+);
 const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
 const bridge = await readFile('src/design/bridge.js','utf8');
