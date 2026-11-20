@@ -148,7 +148,9 @@ function authPage() {
     </section>
     <section class="profile-section" aria-labelledby="accountTitle">
      <div class="profile-section-title"><div><small>SIKKERHET</small><h3 id="accountTitle">Konto</h3></div></div>
+     <button class="profile-action profile-action-soon" type="button" disabled><span>♙</span><span><strong>Personlige opplysninger</strong><small>Navn, kontaktinformasjon og kontodetaljer</small></span><em>Kommer snart</em></button>
      <button class="profile-action" type="button" onclick="resetSignedInPassword()"><span>✉</span><span><strong>Endre passord</strong><small>Få tilsendt en sikker lenke på e-post</small></span><b>›</b></button>
+     <button class="profile-action profile-action-danger profile-action-soon" type="button" disabled><span>×</span><span><strong>Slett konto</strong><small>Slett kontoen og tilknyttede data permanent</small></span><em>Kommer snart</em></button>
      <button class="btn outline profile-logout" type="button" onclick="logoutParkSmart()">Logg ut</button>
     </section>
     <p id="authProfileStatus" class="auth-status" role="status" aria-live="polite"></p>
