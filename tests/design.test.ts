@@ -15,4 +15,5 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('GRATIS NÅ'));assert.ok(output.includes('parking-free-now'));
  assert.ok(output.includes('submitAuthLogin(event)'));assert.ok(output.includes('submitAuthRegistration(event)'));
  assert.ok(output.includes('toggleAuthPassword'));assert.ok(output.includes('Glemt passord?'));
+ assert.ok(!output.includes('Innlogging kommer i en senere versjon.'));
 });
