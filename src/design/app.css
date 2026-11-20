@@ -220,13 +220,36 @@ html, body {
 .auth-hint { margin-top: -6px; color: #6b8190; }
 .auth-status { min-height: 20px; margin: 14px 0 0 !important; color: #08724d; font-size: 13px; line-height: 1.45; }
 .auth-status.error { color: #b53030; }
-.auth-profile { display: flex; flex-direction: column; align-items: center; padding-top: 34px; text-align: center; }
+.auth-profile { display: flex; flex-direction: column; align-items: stretch; gap: 16px; padding: 20px; text-align: left; }
 .auth-profile[hidden] { display: none; }
-.auth-profile .profileavatar { width: 76px; height: 76px; margin-bottom: 18px; color: #0759d8; background: #eaf2ff; }
-.auth-profile .profileavatar svg { width: 34px; height: 34px; }
-.auth-profile > small { color: #6b8190; font-weight: 850; letter-spacing: 1px; }
-.auth-profile > h2 { max-width: 100%; margin: 8px 0 10px; overflow-wrap: anywhere; }
-.auth-profile .btn { width: 100%; margin-top: 26px; }
+.profile-account { display: flex; align-items: center; gap: 14px; padding: 2px 2px 6px; }
+.auth-profile .profileavatar { flex: 0 0 58px; width: 58px; height: 58px; margin: 0; color: #0759d8; background: #eaf2ff; }
+.auth-profile .profileavatar svg { width: 27px; height: 27px; }
+.profile-account small, .profile-section-title small { color: #6b8190; font-size: 10px; font-weight: 850; letter-spacing: 1px; }
+.profile-account h2 { max-width: 100%; margin: 4px 0 0; overflow-wrap: anywhere; font-size: 17px; text-align: left; }
+.profile-section { padding: 18px 16px; border: 1px solid #dce7f1; border-radius: 17px; background: #f9fbfd; }
+.profile-section-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.profile-section-title h3 { margin: 3px 0 0; font-size: 17px; }
+.profile-coming { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: #eaf2ff; color: #0759d8; font-size: 10px; font-weight: 800; }
+.profile-empty { display: flex; align-items: center; gap: 13px; padding: 14px; border: 1px dashed #c7d8e8; border-radius: 14px; background: white; }
+.profile-empty > span { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 13px; background: #fff4cf; color: #a56d00; font-size: 28px; }
+.profile-empty strong { display: block; margin-bottom: 4px; font-size: 13px; }
+.profile-empty p { margin: 0; color: #6b8190; font-size: 11px; line-height: 1.5; }
+.profile-setting-label { margin: 15px 0 8px; color: #233b4c; font-size: 12px; font-weight: 800; }
+.profile-section-title + .profile-setting-label { margin-top: 0; }
+.profile-setting-help { margin: 7px 2px 0; color: #6b8190; font-size: 10px; }
+.profile-segments { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 4px; border-radius: 12px; background: #eaf0f5; }
+.profile-segments button { min-width: 0; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 9px; background: transparent; color: #607789; font-size: 11px; font-weight: 800; }
+.profile-segments button.selected { background: white; color: #0759d8; box-shadow: 0 2px 8px rgba(4, 59, 82, .12); }
+.profile-vehicle-choice { grid-template-columns: 1fr 1fr; }
+.profile-action { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; width: 100%; gap: 10px; padding: 12px 2px; border: 0; border-top: 1px solid #e1e9ef; border-bottom: 1px solid #e1e9ef; background: transparent; color: #183346; text-align: left; }
+.profile-action > span:first-child { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: #eaf2ff; color: #0759d8; font-size: 17px; }
+.profile-action strong, .profile-action small { display: block; }
+.profile-action strong { margin-bottom: 3px; font-size: 13px; }
+.profile-action small { color: #6b8190; font-size: 10px; line-height: 1.4; }
+.profile-action b { color: #7890a2; font-size: 22px; }
+.auth-profile .profile-logout { width: 100%; margin-top: 14px; }
+.auth-profile > .auth-status { margin-top: 0 !important; text-align: center; }
 html[data-theme="dark"] .auth-page { background: linear-gradient(180deg, #101f2c 0%, #101820 55%); }
 html[data-theme="dark"] .auth-card { border-color: #304253; background: #192633; box-shadow: none; }
 html[data-theme="dark"] .auth-tabs { background: #101820; }
@@ -237,6 +260,17 @@ html[data-theme="dark"] .auth-form input { border-color: #405468; background: #1
 html[data-theme="dark"] .auth-password button { background: #263e57; color: #a8ccff; }
 html[data-theme="dark"] .auth-hint { color: #abbecd; }
 html[data-theme="dark"] .auth-profile .profileavatar { background: #233c5b; color: #a8ccff; }
+html[data-theme="dark"] .profile-section { border-color: #304253; background: #14212c; }
+html[data-theme="dark"] .profile-coming { background: #233c5b; color: #a8ccff; }
+html[data-theme="dark"] .profile-empty { border-color: #405468; background: #192633; }
+html[data-theme="dark"] .profile-empty > span { background: #453a1d; color: #f0c768; }
+html[data-theme="dark"] :is(.profile-account small,.profile-section-title small,.profile-empty p,.profile-setting-help,.profile-action small) { color: #abbecd; }
+html[data-theme="dark"] .profile-setting-label { color: #dbe6ef; }
+html[data-theme="dark"] .profile-segments { background: #0f1820; }
+html[data-theme="dark"] .profile-segments button { color: #abbecd; }
+html[data-theme="dark"] .profile-segments button.selected { background: #263e57; color: #a8ccff; box-shadow: none; }
+html[data-theme="dark"] .profile-action { border-color: #304253; color: #e5edf5; }
+html[data-theme="dark"] .profile-action > span:first-child { background: #233c5b; color: #a8ccff; }
 .parking-details-price { font-size: 13px; line-height: 1.7; }
 .parking-free-now {
   display: flex; flex-direction: column; gap: 5px;
