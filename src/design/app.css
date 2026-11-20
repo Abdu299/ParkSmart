@@ -232,9 +232,20 @@ html, body {
 .profile-section-title h3 { margin: 3px 0 0; font-size: 17px; }
 .profile-coming { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: #eaf2ff; color: #0759d8; font-size: 10px; font-weight: 800; }
 .profile-empty { display: flex; align-items: center; gap: 13px; padding: 14px; border: 1px dashed #c7d8e8; border-radius: 14px; background: white; }
+.profile-empty[hidden] { display: none; }
 .profile-empty > span { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 13px; background: #fff4cf; color: #a56d00; font-size: 28px; }
 .profile-empty strong { display: block; margin-bottom: 4px; font-size: 13px; }
 .profile-empty p { margin: 0; color: #6b8190; font-size: 11px; line-height: 1.5; }
+.favorite-list { display: flex; flex-direction: column; gap: 8px; }
+.favorite-place { display: grid; grid-template-columns: 1fr 40px; align-items: stretch; overflow: hidden; border: 1px solid #dce7f1; border-radius: 13px; background: white; }
+.favorite-place-main { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; min-width: 0; gap: 10px; padding: 10px; border: 0; background: transparent; color: #183346; text-align: left; }
+.favorite-place-main > span:nth-child(2) { min-width: 0; }
+.favorite-place-main strong, .favorite-place-main small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.favorite-place-main strong { margin-bottom: 3px; font-size: 12px; }
+.favorite-place-main small { color: #6b8190; font-size: 10px; }
+.favorite-place-main b { color: #7890a2; font-size: 20px; }
+.favorite-place-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #fff4cf; color: #ad7400; font-size: 19px; }
+.favorite-remove { border: 0; border-left: 1px solid #e1e9ef; background: transparent; color: #7890a2; font-size: 21px; }
 .profile-setting-label { margin: 15px 0 8px; color: #233b4c; font-size: 12px; font-weight: 800; }
 .profile-section-title + .profile-setting-label { margin-top: 0; }
 .profile-setting-help { margin: 7px 2px 0; color: #6b8190; font-size: 10px; }
@@ -268,6 +279,11 @@ html[data-theme="dark"] .profile-section { border-color: #304253; background: #1
 html[data-theme="dark"] .profile-coming { background: #233c5b; color: #a8ccff; }
 html[data-theme="dark"] .profile-empty { border-color: #405468; background: #192633; }
 html[data-theme="dark"] .profile-empty > span { background: #453a1d; color: #f0c768; }
+html[data-theme="dark"] .favorite-place { border-color: #304253; background: #192633; }
+html[data-theme="dark"] .favorite-place-main { color: #e5edf5; }
+html[data-theme="dark"] .favorite-place-main small { color: #abbecd; }
+html[data-theme="dark"] .favorite-place-icon { background: #453a1d; color: #f0c768; }
+html[data-theme="dark"] .favorite-remove { border-color: #304253; color: #abbecd; }
 html[data-theme="dark"] :is(.profile-account small,.profile-section-title small,.profile-empty p,.profile-setting-help,.profile-action small) { color: #abbecd; }
 html[data-theme="dark"] .profile-setting-label { color: #dbe6ef; }
 html[data-theme="dark"] .profile-segments { background: #0f1820; }
@@ -278,6 +294,19 @@ html[data-theme="dark"] .profile-action > span:first-child { background: #233c5b
 html[data-theme="dark"] .profile-action em { background: #26333e; color: #abbecd; }
 html[data-theme="dark"] .profile-action-danger strong { color: #ff9ea4; }
 html[data-theme="dark"] .profile-action-danger > span:first-child { background: #46262b; color: #ff9ea4; }
+.parking-popup-title, .parking-detail-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.parking-popup-title > div, .parking-detail-heading > div { min-width: 0; }
+.parking-popup-title h3 { margin: 3px 0 9px; }
+.parking-detail-heading h2 { margin: 0 0 7px; }
+.parking-detail-heading p { margin: 0; }
+.favorite-button { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; gap: 6px; min-height: 44px; padding: 8px 11px; border: 1px solid #d8e3ec; border-radius: 13px; background: white; color: #5e7485; font: inherit; font-size: 12px; font-weight: 800; }
+.favorite-button .favorite-star { color: #a77308; font-size: 25px; line-height: 1; }
+.favorite-button.saved { border-color: #e0b74e; background: #fff7dc; color: #805700; }
+.favorite-compact { width: 44px; padding: 6px; }
+.favorite-detail { min-width: 92px; }
+html[data-theme="dark"] .favorite-button { border-color: #405468; background: #192633; color: #c4d2de; }
+html[data-theme="dark"] .favorite-button .favorite-star { color: #f0c768; }
+html[data-theme="dark"] .favorite-button.saved { border-color: #8b7134; background: #453a1d; color: #f0d58d; }
 .parking-details-price { font-size: 13px; line-height: 1.7; }
 .parking-free-now {
   display: flex; flex-direction: column; gap: 5px;
