@@ -29,6 +29,6 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('favorite-trash'));assert.ok(output.includes('requestFavoriteDelete'));
  assert.ok(output.includes('Vil du faktisk slette'));assert.ok(output.includes('parksmart-favorites:'));
  assert.ok(output.includes('data-tab="scan"'));assert.ok(output.includes('<span>Skann skilt</span>'));assert.ok(output.includes('openScanTab()'));
- assert.ok(output.includes('Godkjenn og analyser'));assert.ok(output.includes('analyzeSignPhotoWithAi'));
+ assert.ok(output.includes('scanAiPending'));assert.ok(output.includes('analyzeSignPhotoWithAi'));
  assert.ok(output.includes("target: 'ai'"));assert.ok(output.includes('Forklar dette parkeringsskiltet'));
 });
