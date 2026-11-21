@@ -60,6 +60,15 @@ html, body {
   font-size: 29px;
   border-radius: 13px;
 }
+#home .feature-icon svg {
+  display: block;
+  width: 29px;
+  height: 29px;
+}
+#home .feature-icon-search { background: #e7f1ff; color: #1769d2; }
+#home .feature-icon-camera { background: #f2eaff; color: #8050b5; }
+#home .feature-icon-map { background: #e4f8f1; color: #08745e; }
+#home .feature-icon-guide { background: #fff0e9; color: #ca6440; }
 #home .features + .card {
   border-color: #d6e7ee;
   background: linear-gradient(110deg, #f4faff, #edf8f5);
@@ -74,6 +83,10 @@ html[data-theme="dark"] #home .search { background: #1b2b38; border-color: #344b
 html[data-theme="dark"] #home .vehicle button:nth-child(n) { background: #1d2d3a; color: #dce8f2; }
 html[data-theme="dark"] #home .vehicle button.on { background: #15394b; color: #e7f7fb; }
 html[data-theme="dark"] #home .feature { background: #192633; border-color: #304253; box-shadow: none; }
+html[data-theme="dark"] #home .feature-icon-search { background: #203b5c !important; color: #9ec5ff; }
+html[data-theme="dark"] #home .feature-icon-camera { background: #3b2c4e !important; color: #d2acf3; }
+html[data-theme="dark"] #home .feature-icon-map { background: #193f38 !important; color: #8adbc3; }
+html[data-theme="dark"] #home .feature-icon-guide { background: #4a3028 !important; color: #f2b099; }
 html[data-theme="dark"] #home .features + .card { background: #192b35; border-color: #304b55; box-shadow: none; }
 .phone {
   display: flex;
