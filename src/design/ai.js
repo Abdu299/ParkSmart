@@ -6,10 +6,66 @@
   let requestNumber = 0;
   let pendingLocationQuestion = null;
   let lastParkingIds = [];
+  let lastParkingOrigin = null;
   const history = [];
   const requestTimers = new Map();
   const expiredRequests = new Set();
   const signRequests = new Set();
+  const osloAreas = [
+    ['Grønland', 59.9127, 10.7600, ['grønland']],
+    ['Sentrum', 59.9139, 10.7387, ['sentrum', 'oslo sentrum', 'kvadraturen']],
+    ['Bjørvika', 59.9075, 10.7564, ['bjørvika', 'barcode']],
+    ['Sørenga', 59.9038, 10.7538, ['sørenga']],
+    ['Tøyen', 59.9148, 10.7737, ['tøyen']],
+    ['Kampen', 59.9129, 10.7817, ['kampen']],
+    ['Vålerenga', 59.9088, 10.7866, ['vålerenga']],
+    ['Gamle Oslo', 59.9069, 10.7788, ['gamle oslo', 'gamlebyen']],
+    ['Ensjø', 59.9133, 10.7917, ['ensjø']],
+    ['Helsfyr', 59.9120, 10.8061, ['helsfyr']],
+    ['Etterstad', 59.9068, 10.8004, ['etterstad']],
+    ['Grünerløkka', 59.9238, 10.7595, ['grünerløkka', 'løkka']],
+    ['Carl Berner', 59.9256, 10.7755, ['carl berner']],
+    ['Hasle', 59.9250, 10.7925, ['hasle']],
+    ['Sinsen', 59.9360, 10.7800, ['sinsen']],
+    ['Løren', 59.9305, 10.7980, ['løren']],
+    ['Torshov', 59.9348, 10.7653, ['torshov']],
+    ['Sagene', 59.9380, 10.7528, ['sagene']],
+    ['St. Hanshaugen', 59.9271, 10.7398, ['st hanshaugen', 'st. hanshaugen']],
+    ['Bislett', 59.9255, 10.7318, ['bislett']],
+    ['Majorstuen', 59.9294, 10.7147, ['majorstuen', 'majorstua']],
+    ['Frogner', 59.9227, 10.7065, ['frogner']],
+    ['Vika', 59.9132, 10.7248, ['vika']],
+    ['Aker brygge', 59.9107, 10.7262, ['aker brygge']],
+    ['Tjuvholmen', 59.9090, 10.7207, ['tjuvholmen']],
+    ['Skøyen', 59.9224, 10.6797, ['skøyen']],
+    ['Ullern', 59.9250, 10.6540, ['ullern']],
+    ['Røa', 59.9470, 10.6420, ['røa']],
+    ['Smestad', 59.9360, 10.6820, ['smestad']],
+    ['Vinderen', 59.9430, 10.7040, ['vinderen']],
+    ['Blindern', 59.9405, 10.7206, ['blindern']],
+    ['Ullevål', 59.9483, 10.7312, ['ullevål']],
+    ['Nydalen', 59.9490, 10.7680, ['nydalen']],
+    ['Bjølsen', 59.9435, 10.7565, ['bjølsen']],
+    ['Sandaker', 59.9490, 10.7700, ['sandaker']],
+    ['Grefsen', 59.9540, 10.7780, ['grefsen']],
+    ['Kjelsås', 59.9660, 10.7830, ['kjelsås']],
+    ['Bjerke', 59.9410, 10.8290, ['bjerke']],
+    ['Økern', 59.9275, 10.8130, ['økern']],
+    ['Bryn', 59.9085, 10.8190, ['bryn']],
+    ['Alna', 59.9300, 10.8700, ['alna']],
+    ['Furuset', 59.9410, 10.8900, ['furuset']],
+    ['Haugerud', 59.9220, 10.8600, ['haugerud']],
+    ['Grorud', 59.9610, 10.8810, ['grorud']],
+    ['Stovner', 59.9620, 10.9240, ['stovner']],
+    ['Manglerud', 59.8980, 10.8140, ['manglerud']],
+    ['Ryen', 59.8940, 10.8040, ['ryen']],
+    ['Oppsal', 59.8920, 10.8420, ['oppsal']],
+    ['Bøler', 59.8840, 10.8460, ['bøler']],
+    ['Nordstrand', 59.8610, 10.7990, ['nordstrand']],
+    ['Lambertseter', 59.8730, 10.8130, ['lambertseter']],
+    ['Holmlia', 59.8350, 10.7940, ['holmlia']],
+    ['Mortensrud', 59.8480, 10.8290, ['mortensrud']]
+  ];
 
   const messages = () => document.getElementById('aiMessages');
   const input = () => document.getElementById('aiInput');
@@ -76,10 +132,30 @@
     return 6371000 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
   }
 
-  function relevantParking(question) {
-    if (!Array.isArray(appPerson) || appPerson.length !== 2) return [];
+  function normalizeAreaText(value) {
+    return String(value).toLocaleLowerCase('nb-NO').normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[.,!?]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function requestedArea(question) {
+    const text = ' ' + normalizeAreaText(question) + ' ';
+    const matches = osloAreas.flatMap(([name, latitude, longitude, aliases]) => aliases.map(alias => ({
+      name,
+      center: [latitude, longitude],
+      alias: normalizeAreaText(alias)
+    }))).sort((a, b) => b.alias.length - a.alias.length);
+    return matches.find(area => text.includes(' ' + area.alias + ' ')) || null;
+  }
+
+  function isParkingSearchQuestion(question) {
+    return /nærmest|i nærheten|i området|nær meg|rundt meg|hvor er|finn.*parkering|finnes.*parkering|parkeringsplass|parkering.*\b(?:på|i|ved)\b/.test(question.toLocaleLowerCase('nb-NO'));
+  }
+
+  function relevantParking(question, requestedOrigin = null) {
     const normalized = question.toLocaleLowerCase('nb-NO');
     const isFollowUp = /den første|det første|den andre|det andre|den tredje|det tredje|denne|den der|må jeg betale|hvor mye|hva koster|pris/.test(normalized) && lastParkingIds.length;
+    const area = requestedArea(question);
+    const origin = requestedOrigin || area?.center || (isFollowUp ? lastParkingOrigin : null) || appPerson;
+    if (!Array.isArray(origin) || origin.length !== 2) return [];
     let candidates = isFollowUp
       ? lastParkingIds.map(id => PARKING_DATA.find(place => place.id === id)).filter(Boolean)
       : PARKING_DATA.filter(place => !place.forbidden);
@@ -89,7 +165,7 @@
         name: place.name,
         address: place.address || 'Adresse ikke oppgitt',
         type: place.kind,
-        distanceMeters: Math.round(distanceMeters(appPerson, place.center)),
+        distanceMeters: Math.round(distanceMeters(origin, place.center)),
         status: place.status,
         statusDetail: place.statusDetail,
         isFreeNow: place.isFreeNow,
@@ -109,7 +185,7 @@
     if (/\bhc\b|handikap|funksjonshem/.test(normalized)) candidates = candidates.filter(place => place.hcSpaces > 0);
     if (/gratis|avgiftsfri|uten å betale/.test(normalized)) candidates = candidates.filter(place => place.isFreeNow === true);
     return candidates
-      .map(place => ({ place, distance: distanceMeters(appPerson, place.center) }))
+      .map(place => ({ place, distance: distanceMeters(origin, place.center) }))
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 8)
       .map(({ place, distance }) => ({
@@ -134,7 +210,7 @@
   }
 
   function needsLocation(question) {
-    return /nærmest|i nærheten|i området|nær meg|rundt meg|hvor er|finn.*parkering|finnes.*parkering/.test(question.toLocaleLowerCase('nb-NO'));
+    return isParkingSearchQuestion(question) && !requestedArea(question);
   }
 
   function setBusy(value) {
@@ -148,8 +224,11 @@
 
   function answerParkingSearchLocally(question) {
     const normalized = question.toLocaleLowerCase('nb-NO');
-    if (!/nærmest|i nærheten|i området|nær meg|rundt meg|hvor er|finn.*parkering|finnes.*parkering/.test(normalized) || !appPerson) return false;
-    const parking = relevantParking(question);
+    if (!isParkingSearchQuestion(question)) return false;
+    const area = requestedArea(question);
+    const origin = area?.center || appPerson;
+    if (!Array.isArray(origin) || origin.length !== 2) return false;
+    const parking = relevantParking(question, origin);
     const asksFree = /gratis|avgiftsfri|uten å betale/.test(normalized);
     const asksMc = /\bmc\b|motorsykkel/.test(normalized);
     const asksCharging = /lad|elbil/.test(normalized);
@@ -157,7 +236,7 @@
     const kind = asksFree ? 'gratisparkering' : asksMc ? 'MC-parkering' : asksCharging ? 'parkering med lading' : asksHc ? 'HC-parkering' : 'parkering';
 
     if (!parking.length) {
-      const answer = 'Jeg fant ingen registrert ' + kind + ' i parkeringsdataene rundt posisjonen din. Prøv kartet eller fjern noen av filtrene.';
+      const answer = 'Jeg fant ingen registrert ' + kind + (area ? ' rundt ' + area.name : ' rundt posisjonen din') + '. Prøv kartet eller fjern noen av filtrene.';
       addMessage('assistant', answer);
       history.push({ role: 'assistant', text: answer });
       return true;
@@ -165,12 +244,13 @@
 
     const nearest = parking[0];
     const source = PARKING_DATA.find(place => place.id === nearest.id);
-    const distance = source ? formatDistance(source) : Math.round(nearest.distanceMeters) + ' m';
+    const distance = source ? formatDistance(source, origin) : Math.round(nearest.distanceMeters) + ' m';
     const rule = String(nearest.statusDetail || nearest.status || '').trim().slice(0, 240);
-    const answer = 'Den nærmeste registrerte ' + kind + ' er ' + nearest.name + ', omtrent ' + distance + ' unna i luftlinje.' + (rule ? ' ' + rule : '') + ' Appen har ikke sanntidsdata om ledige plasser.';
+    const answer = 'Den nærmeste registrerte ' + kind + (area ? ' til ' + area.name : '') + ' er ' + nearest.name + ', omtrent ' + distance + ' unna i luftlinje.' + (rule ? ' ' + rule : '') + ' Appen har ikke sanntidsdata om ledige plasser.';
     const result = addMessage('assistant', answer);
     lastParkingIds = parking.slice(0, 3).map(place => place.id);
-    if (result) addParkingCards(result.bubble, lastParkingIds);
+    lastParkingOrigin = origin;
+    if (result) addParkingCards(result.bubble, lastParkingIds, origin);
     history.push({ role: 'assistant', text: answer.slice(0, 1500) });
     if (history.length > 12) history.splice(0, history.length - 12);
     return true;
@@ -207,13 +287,13 @@
     if (!sent) receiveAiError({ requestId, message: 'AI krever at appen kjøres gjennom Expo. Start appen med npx expo start --clear.' });
   }
 
-  function formatDistance(place) {
-    if (!appPerson || !place || !Array.isArray(place.center)) return '';
-    const meters = distanceMeters(appPerson, place.center);
+  function formatDistance(place, origin = appPerson) {
+    if (!Array.isArray(origin) || !place || !Array.isArray(place.center)) return '';
+    const meters = distanceMeters(origin, place.center);
     return meters < 1000 ? Math.round(meters) + ' m' : (meters / 1000).toFixed(1).replace('.', ',') + ' km';
   }
 
-  function addParkingCards(bubble, ids) {
+  function addParkingCards(bubble, ids, origin = appPerson) {
     if (!Array.isArray(ids) || !ids.length) return;
     const valid = ids.map(id => PARKING_DATA.find(place => place.id === id)).filter(Boolean).slice(0, 3);
     if (!valid.length) return;
@@ -226,7 +306,7 @@
       const title = document.createElement('strong');
       title.textContent = place.name;
       const detail = document.createElement('small');
-      detail.textContent = [formatDistance(place), place.status, place.address].filter(Boolean).join(' · ');
+      detail.textContent = [formatDistance(place, origin), place.status, place.address].filter(Boolean).join(' · ');
       const arrow = document.createElement('span');
       arrow.textContent = '›';
       button.append(title, detail, arrow);
