@@ -16,7 +16,7 @@ const appOriginalGo = go;
 go = function (id) {
   appOriginalGo(id);
   appCurrentScreen = id === 'map' ? 'find' : id;
-  const activeTab = ['find', 'details', 'payment'].includes(appCurrentScreen) ? 'map' : ['scan', 'signPreview', 'signResult', 'recognized', 'guideDetail'].includes(appCurrentScreen) ? 'guide' : appCurrentScreen;
+  const activeTab = ['find', 'details', 'payment'].includes(appCurrentScreen) ? 'map' : ['scan', 'signPreview', 'signResult', 'recognized'].includes(appCurrentScreen) ? 'scan' : ['guide', 'guideDetail'].includes(appCurrentScreen) ? 'home' : appCurrentScreen;
   document.querySelectorAll('#appNavigation [data-tab]').forEach(button => {
     const active = button.dataset.tab === activeTab;
     button.classList.toggle('active', active);
@@ -280,6 +280,10 @@ function refreshAppData() {
 }
 const appOriginalCamera = openSignCamera,
   appOriginalChoose = chooseSignPhoto;
+window.openScanTab = function () {
+  go('scan');
+  setTimeout(() => openSignCamera(), 50);
+};
 openSignCamera = function () {
   if (!nativeSend({
     type: 'photo',
@@ -294,9 +298,16 @@ chooseSignPhoto = function () {
 };
 useSignPhoto = function () {
   if (!signPhotoURL) return;
-  document.getElementById('signResultImage').src = signPhotoURL;
-  go('signResult');
-  analysisMessage('Automatisk analyse kommer senere', 'Bildet blir på enheten. Bruk skiltguiden for å finne skilt og lese forklaringen.');
+  if (typeof window.analyzeSignPhotoWithAi === 'function') {
+    window.analyzeSignPhotoWithAi(signPhotoURL);
+    return;
+  }
+  cameraStatus('AI-analysen er ikke klar ennå. Prøv igjen.');
+};
+const appOriginalRetakeSignPhoto = retakeSignPhoto;
+retakeSignPhoto = function () {
+  appOriginalRetakeSignPhoto();
+  setTimeout(() => openSignCamera(), 50);
 };
 window.ParkSmartNative = {
   receive: function (packet) {
