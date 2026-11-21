@@ -144,6 +144,8 @@ html, body {
 #find .parking-map-wrap { flex: 1 1 0%; min-height: 0; isolation: isolate; }
 #find .parking-sheet { max-height: 28%; }
 #find .parking-sheet.expanded { max-height: 45%; }
+#find.bike-mode .parking-filters,
+#find.bike-mode .parking-controls { display: none; }
 /* Compact list action with the same visual weight as the other controls. */
 #find .parking-summary { position: sticky; top: 0; z-index: 2; gap: 8px; align-items: center; padding: 8px 0 4px; background: white; }
 #find #listToggle {
