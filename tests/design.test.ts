@@ -36,4 +36,6 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('packet.signCode'));assert.ok(output.includes("descriptionCode"));
  assert.ok(output.includes("sign ? openGuideSign(sign.id) : go('guide')"));
  assert.ok(output.includes('const parking = signOnly ? [] : relevantParking(question)'));
+ assert.ok(output.includes('hideAiPhotoPreview()'));assert.ok(output.includes('input().blur()'));
+ assert.ok(!output.includes("setBusy(false);\n    input()?.focus({ preventScroll: true });"));
 });
