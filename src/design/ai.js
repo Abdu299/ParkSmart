@@ -316,8 +316,21 @@
   window.ParkSmartNative.receive = packet => {
     if (packet.type === 'aiResult') { receiveAiResult(packet); return; }
     if (packet.type === 'aiError') { receiveAiError(packet); return; }
-    if (packet.type === 'photo' && packet.target === 'ai') { receiveAiPhoto(packet); return; }
+    if (packet.type === 'photo' && packet.target === 'ai') {
+      if (window.scanAiPending) {
+        window.scanAiPending = false;
+        window.analyzeSignPhotoWithAi(packet.dataUrl);
+      } else receiveAiPhoto(packet);
+      return;
+    }
     if (packet.type === 'photoError' && packet.target === 'ai') {
+      if (window.scanAiPending) {
+        window.scanAiPending = false;
+        go('scan');
+        const status = document.getElementById('cameraStatus');
+        if (status) status.textContent = packet.message || 'Bildet kunne ikke åpnes.';
+        return;
+      }
       addMessage('assistant', packet.message || 'Bildet kunne ikke åpnes.', { error: true });
       return;
     }
