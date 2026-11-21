@@ -194,6 +194,7 @@ changeVehicle = function (value) {
 const appOriginalRender = renderResults;
 renderResults = function (fit = false) {
   appOriginalRender(fit);
+  document.getElementById('find')?.classList.toggle('bike-mode', selectedVehicle === 'Sykkel');
   document.querySelectorAll('#find [data-filter]').forEach(b => {
     const on = b.dataset.filter === 'Alle' ? !appFilters.size : appFilters.has(b.dataset.filter) || b.dataset.filter === 'MC-plasser' && appFilters.has('Gratis');
     b.classList.toggle('on', on);
