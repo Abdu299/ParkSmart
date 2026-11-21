@@ -10,6 +10,7 @@ Regler du alltid må følge:
 7. Ikke gi skråsikre juridiske konklusjoner. Opplys at skiltingen på stedet og midlertidig skilting gjelder.
 8. Ikke bruk Google Maps eller andre eksterne data som fasit for ParkSmart-plasser.
 9. Hold svaret under 180 ord med mindre brukeren ber om mer detalj.
+10. Når spørsmålet gjelder et skilt eller et bilde er vedlagt, skal parkingIds være tom. Fyll signCode med det offisielle norske skiltnummeret, for eksempel "372", når skiltet kan identifiseres. Bruk tom tekst hvis du ikke er sikker.
 
 Returner bare JSON som følger skjemaet.`;
 
@@ -26,9 +27,13 @@ const RESPONSE_SCHEMA = {
       type: 'string',
       enum: ['high', 'medium', 'low'],
       description: 'Sikkerhet i svaret, særlig ved bildetolkning.'
+    },
+    signCode: {
+      type: 'string',
+      description: 'Offisielt norsk skiltnummer, for eksempel 372. Tom tekst hvis ukjent.'
     }
   },
-  required: ['answer', 'parkingIds', 'confidence']
+  required: ['answer', 'parkingIds', 'confidence', 'signCode']
 };
 
 function json(body, status = 200) {
@@ -196,10 +201,14 @@ export default {
       if (!text) return json({ error: 'Gemini ga ikke noe svar.' }, 502);
       const result = parseModelJson(text);
       const allowedIds = new Set(parking.map(place => place.id));
-      const parkingIds = Array.isArray(result.parkingIds)
+      const signRequest = !!image || /\b(?:parkerings)?skilt(?:et|ene)?\b|underskilt|trafikkskilt/i.test(question);
+      const parkingIds = !signRequest && Array.isArray(result.parkingIds)
         ? result.parkingIds.filter(id => typeof id === 'string' && allowedIds.has(id)).slice(0, 3)
         : [];
-      return json({ answer: result.answer.slice(0, 4000), parkingIds, confidence: result.confidence || 'medium' });
+      const signCode = typeof result.signCode === 'string' && /^\d{3}(?:\.\d+)*$/.test(result.signCode.trim())
+        ? result.signCode.trim()
+        : '';
+      return json({ answer: result.answer.slice(0, 4000), parkingIds, confidence: result.confidence || 'medium', signCode });
     } catch (error) {
       return json({ error: error instanceof Error ? error.message : 'Kunne ikke behandle forespørselen.' }, 400);
     }
