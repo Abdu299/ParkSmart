@@ -1,4 +1,4 @@
-/* global PARKING_DATA, appOpenDetails, appPerson, nativeSend, requestHomeLocation, go */
+/* global PARKING_DATA, SIGN_GUIDE, appOpenDetails, appPerson, nativeSend, requestHomeLocation, go, openGuideSign */
 /* ParkSmart AI presentation layer. The native host owns networking and secrets. */
 (() => {
   let imageDataUrl = null;
@@ -9,6 +9,7 @@
   const history = [];
   const requestTimers = new Map();
   const expiredRequests = new Set();
+  const signRequests = new Set();
 
   const messages = () => document.getElementById('aiMessages');
   const input = () => document.getElementById('aiInput');
@@ -51,6 +52,13 @@
     bubble.className = 'ai-bubble' + (options.loading ? ' ai-loading' : '') + (options.error ? ' ai-error' : '');
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
+    if (options.imageDataUrl) {
+      const photo = document.createElement('img');
+      photo.className = 'ai-message-photo';
+      photo.src = options.imageDataUrl;
+      photo.alt = 'Parkeringsskilt sendt til ParkSmart AI';
+      bubble.appendChild(photo);
+    }
     bubble.appendChild(paragraph);
     row.appendChild(bubble);
     list.appendChild(row);
@@ -174,9 +182,11 @@
       setBusy(false);
       return;
     }
-    const parking = relevantParking(question);
+    const signOnly = !!imageDataUrl || /\b(?:parkerings)?skilt(?:et|ene)?\b|underskilt|trafikkskilt/.test(question.toLocaleLowerCase('nb-NO'));
+    const parking = signOnly ? [] : relevantParking(question);
     const requestId = 'ai-' + Date.now() + '-' + (++requestNumber);
-    const waiting = addMessage('assistant', imageDataUrl ? 'Analyserer bildet og parkeringsdataene …' : 'Sjekker parkeringsdataene …', { loading: true });
+    if (signOnly) signRequests.add(requestId);
+    const waiting = addMessage('assistant', signOnly ? 'Analyserer skiltet …' : 'Sjekker parkeringsdataene …', { loading: true });
     if (waiting) waiting.row.dataset.requestId = requestId;
     requestTimers.set(requestId, setTimeout(() => {
       requestTimers.delete(requestId);
@@ -226,6 +236,39 @@
     bubble.appendChild(container);
   }
 
+  function findGuideSign(answer) {
+    if (!Array.isArray(SIGN_GUIDE)) return null;
+    const codes = [...String(answer).matchAll(/\b(?:skilt(?:et)?|nummer)\s*(\d{3}(?:\.\d+)*)/gi)].map(match => match[1]);
+    for (const code of codes) {
+      const exact = SIGN_GUIDE.find(sign => sign.code === code || sign.id === code);
+      if (exact) return exact;
+    }
+    const normalized = String(answer).toLocaleLowerCase('nb-NO');
+    return SIGN_GUIDE.find(sign => sign.title.length >= 5 && normalized.includes(sign.title.toLocaleLowerCase('nb-NO'))) || null;
+  }
+
+  function addSignGuideCard(bubble, answer) {
+    const sign = findGuideSign(answer);
+    if (!sign) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ai-sign-guide-card';
+    const image = document.createElement('img');
+    image.src = sign.image;
+    image.alt = sign.title + ', skilt ' + sign.code;
+    const text = document.createElement('span');
+    const title = document.createElement('strong');
+    title.textContent = sign.title;
+    const detail = document.createElement('small');
+    detail.textContent = 'Skilt ' + sign.code + ' · Se mer i skiltguiden';
+    text.append(title, detail);
+    const arrow = document.createElement('b');
+    arrow.textContent = '›';
+    button.append(image, text, arrow);
+    button.addEventListener('click', () => openGuideSign(sign.id));
+    bubble.appendChild(button);
+  }
+
   function receiveAiResult(packet) {
     const requestId = String(packet.requestId || '');
     if (expiredRequests.has(requestId)) { expiredRequests.delete(requestId); return; }
@@ -235,8 +278,10 @@
     if (waiting) waiting.remove();
     const answer = typeof packet.answer === 'string' && packet.answer.trim() ? packet.answer.trim() : 'Jeg klarte ikke å lage et svar. Prøv å formulere spørsmålet på nytt.';
     const result = addMessage('assistant', answer);
-    if (result) addParkingCards(result.bubble, packet.parkingIds);
-    if (Array.isArray(packet.parkingIds) && packet.parkingIds.length) lastParkingIds = packet.parkingIds.slice(0, 3);
+    const signOnly = signRequests.delete(requestId);
+    if (result && signOnly) addSignGuideCard(result.bubble, answer);
+    if (result && !signOnly) addParkingCards(result.bubble, packet.parkingIds);
+    if (!signOnly && Array.isArray(packet.parkingIds) && packet.parkingIds.length) lastParkingIds = packet.parkingIds.slice(0, 3);
     history.push({ role: 'assistant', text: answer.slice(0, 1500) });
     if (history.length > 12) history.splice(0, history.length - 12);
     window.removeAiPhoto();
@@ -249,6 +294,7 @@
     if (expiredRequests.has(requestId) && !packet.watchdog) { expiredRequests.delete(requestId); return; }
     clearTimeout(requestTimers.get(requestId));
     requestTimers.delete(requestId);
+    signRequests.delete(requestId);
     const waiting = document.querySelector('[data-request-id="' + CSS.escape(requestId) + '"]');
     if (waiting) waiting.remove();
     addMessage('assistant', packet.message || 'AI-tjenesten svarte ikke. Prøv igjen om litt.', { error: true });
@@ -261,7 +307,8 @@
     const question = (input()?.value || '').trim();
     if (!question && !imageDataUrl) return;
     const finalQuestion = question || 'Hva betyr parkeringsskiltet på bildet?';
-    addMessage('user', finalQuestion + (imageDataUrl ? '\n📷 Bilde vedlagt' : ''));
+    const attachedImage = imageDataUrl;
+    addMessage('user', finalQuestion, { imageDataUrl: attachedImage });
     history.push({ role: 'user', text: finalQuestion.slice(0, 500) });
     if (input()) input().value = '';
     if (needsLocation(finalQuestion) && !appPerson) {
