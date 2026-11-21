@@ -33,5 +33,7 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes("target: 'ai'"));assert.ok(output.includes('Forklar dette parkeringsskiltet'));
  assert.ok(output.includes('ai-message-photo'));assert.ok(output.includes('ai-sign-guide-card'));
  assert.ok(output.includes('findGuideSign'));assert.ok(output.includes('openGuideSign(sign.id)'));
+ assert.ok(output.includes('packet.signCode'));assert.ok(output.includes("descriptionCode"));
+ assert.ok(output.includes("sign ? openGuideSign(sign.id) : go('guide')"));
  assert.ok(output.includes('const parking = signOnly ? [] : relevantParking(question)'));
 });
