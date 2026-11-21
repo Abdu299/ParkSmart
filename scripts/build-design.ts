@@ -37,6 +37,11 @@ html = html.replace('<div id="addressStatus"', '<div class="parking-controls"><l
 html = html.replace('<button class="pill" data-filter="Parkeringshus"', '<button class="pill" data-filter="Betaling" onclick="filter(this)">Betaling</button><button class="pill" data-filter="HC" onclick="filter(this)">HC</button><button class="pill" data-filter="Lading" onclick="filter(this)">Lading</button><button class="pill" data-filter="Parkeringshus"');
 html = html.replace(/<details class="parking-sources">[\s\S]*?<\/details>/, '<details class="parking-sources"><summary>Kartdata og vilkår · '+dataset.fetchedAt.slice(0,10)+'</summary><p>Oslo kommune og Statens vegvesen. Kartbakgrunn: Kartverket. Markører viser steder og strekninger, ikke ledighet. HC/lading kan vise egenskaper ved hele områder. Næradresser er omtrentlige. Skiltingen på stedet gjelder.</p><p>Avgiftsfrie plasser i registeret bekrefter ikke fri tilgang. Prisavvik gir ukjent tidsstatus. <button class="pill" onclick="refreshAppData()">Oppdater data</button></p></details>');
 html = html.replace(/(<button class="feature" onclick=")go\('find'\)("><span class="symbol">🔎)/, "$1go('ai')$2");
+html = html
+  .replace('<span class="symbol">🔎</span><strong>Finn parkering</strong>', `<span class="symbol feature-icon feature-icon-search">${featureIcon('search')}</span><strong>Finn parkering</strong>`)
+  .replace('<span class="symbol" style="background:#f2e8ff">📷</span><strong>Skann skilt</strong>', `<span class="symbol feature-icon feature-icon-camera">${featureIcon('camera')}</span><strong>Skann skilt</strong>`)
+  .replace('<span class="symbol" style="background:#e0faeb">🅿️</span><strong>Parkeringskart</strong>', `<span class="symbol feature-icon feature-icon-map">${featureIcon('map')}</span><strong>Parkeringskart</strong>`)
+  .replace('<span class="symbol" style="background:#fff0ed">📖</span><strong>Skiltguide</strong>', `<span class="symbol feature-icon feature-icon-guide">${featureIcon('guide')}</span><strong>Skiltguide</strong>`);
 // Leaflet auto-pans when a popup is close to the edge. That movement used to
 // trigger drawParking(), which cleared the marker layer and immediately closed
 // the popup. Keep the current layer while a popup is open; normal map movement
@@ -235,6 +240,15 @@ function navIcon(id: string) {
   profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
  };
  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
+}
+function featureIcon(id: 'search'|'camera'|'map'|'guide') {
+ const paths: Record<string,string> = {
+  search: '<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/><path d="M8.5 13V8h2.2a1.7 1.7 0 0 1 0 3.4H8.5"/>',
+  camera: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="4"/><path d="M18 9h.01"/>',
+  map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2z"/><path d="M9 3v16M15 5v16"/>',
+  guide: '<path d="M12 21V5M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-3-1-6-2-10 1z"/>'
+ };
+ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
 }
 function appNavigation() {
  const tabs = [['home','Hjem'],['map','Kart'],['ai','AI-søk'],['scan','Skann skilt'],['profile','Profil']];
