@@ -1048,6 +1048,41 @@ html[data-theme="dark"] #find .parking-filters .pill.on { border-color: #6095df;
 html[data-theme="dark"] #find .parking-sheet { border-color: #304253; background: linear-gradient(180deg, #14212b, #101820); box-shadow: 0 -7px 22px rgba(0,0,0,.2); }
 html[data-theme="dark"] #find #listToggle { background: linear-gradient(115deg, #20364d, #1d3a38); }
 html[data-theme="dark"] #find .fit-button { background: #20364d; color: #b7d5ff; }
+
+/* Keep the controls above the map compact so the map gets more height. */
+#find .parking-toolbar { padding: 8px 12px 4px; }
+#find .parking-search + .parking-controls { margin: 4px 0; }
+#find .parking-controls {
+  min-height: 36px;
+  gap: 5px;
+  margin: 3px 0;
+  font-size: 10px;
+}
+#find .parking-controls select {
+  min-height: 34px;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+#find .location-button {
+  min-height: 36px;
+  padding: 5px 10px;
+  font-size: 11px;
+}
+#find .parking-filters {
+  gap: 5px;
+  padding: 0 0 5px;
+}
+#find .parking-filters .pill {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 10px;
+}
+#find .parking-filters + .parking-controls { margin: 2px 0 0; }
+#find #freeNowButton {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 10px;
+}
 html[data-theme="dark"] #profile .top { background: linear-gradient(120deg, #101f2c, #16455a); }
 html[data-theme="dark"] #profile .auth-page { background: radial-gradient(circle at 100% 0%, rgba(39, 104, 189, .16), transparent 30%), #101820; }
 html[data-theme="dark"] #profile .profile-account { border-color: #355065; background: linear-gradient(115deg, #1d3041, #193632); }
