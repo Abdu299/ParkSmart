@@ -285,16 +285,26 @@ window.openScanTab = function () {
   setTimeout(() => openSignCamera(), 50);
 };
 openSignCamera = function () {
+  window.scanAiPending = true;
   if (!nativeSend({
     type: 'photo',
-    camera: true
-  })) appOriginalCamera();
+    camera: true,
+    target: 'ai'
+  })) {
+    window.scanAiPending = false;
+    appOriginalCamera();
+  }
 };
 chooseSignPhoto = function () {
+  window.scanAiPending = true;
   if (!nativeSend({
     type: 'photo',
-    camera: false
-  })) appOriginalChoose();
+    camera: false,
+    target: 'ai'
+  })) {
+    window.scanAiPending = false;
+    appOriginalChoose();
+  }
 };
 useSignPhoto = function () {
   if (!signPhotoURL) return;
