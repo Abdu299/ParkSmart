@@ -38,4 +38,7 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('const parking = signOnly ? [] : relevantParking(question)'));
  assert.ok(output.includes('hideAiPhotoPreview()'));assert.ok(output.includes('input().blur()'));
  assert.ok(!output.includes("setBusy(false);\n    input()?.focus({ preventScroll: true });"));
+ assert.ok(output.includes("['Grønland', 59.9127, 10.7600"));
+ assert.ok(output.includes('requestedArea(question)'));assert.ok(output.includes('area?.center || appPerson'));
+ assert.ok(output.includes("' til ' + area.name"));
 });
