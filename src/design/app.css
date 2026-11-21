@@ -714,6 +714,194 @@ html[data-theme="dark"] #home .home-evening { border-color: #304253; background:
 html[data-theme="dark"] #home .home-action-icon { background: #233846; color: #b9d7ef; }
 html[data-theme="dark"] #home .home-evening > span:first-child { background: #315f75; }
 
+/* Home v3: familiar parking-app layout built around one primary task. */
+#home .home-v3 {
+  padding: 22px 18px 30px;
+  background: #f4f6f7;
+}
+#home .home-v3-header { margin: 0 2px 18px; }
+#home .home-v3-brand { display: flex; align-items: center; gap: 10px; }
+#home .home-v3-brand .logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #07384d;
+  box-shadow: none;
+  font-size: 25px;
+}
+#home .home-v3-brand strong { color: #102f3e; font-size: 20px; letter-spacing: -.3px; }
+#home .home-v3-header .theme-toggle {
+  min-height: 38px;
+  border: 1px solid #d8e1e5;
+  background: white;
+  color: #405966;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 750;
+}
+#home .home-hero {
+  padding: 20px;
+  border-radius: 20px;
+  background: #07384d;
+  color: white;
+  box-shadow: 0 10px 24px rgba(7, 56, 77, .16);
+}
+#home .home-hero-copy small { font-size: 8px; font-weight: 850; letter-spacing: 1.2px; opacity: .7; }
+#home .home-hero-copy h1 { margin: 7px 0 5px; font-size: 25px; line-height: 1.15; letter-spacing: -.5px; }
+#home .home-hero-copy p { margin: 0 0 17px; color: #d1e0e6; font-size: 11px; line-height: 1.5; }
+#home .home-v3-search {
+  display: grid;
+  grid-template-columns: 22px 1fr 20px;
+  align-items: center;
+  width: 100%;
+  min-height: 54px;
+  gap: 10px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 13px;
+  background: white;
+  color: #173746;
+  text-align: left;
+  box-shadow: none;
+}
+#home .home-v3-search > span:first-child { color: #1769d2; }
+#home .home-v3-search > span:nth-child(2) { font-size: 13px; font-weight: 650; }
+#home .home-v3-search svg { width: 20px; height: 20px; }
+#home .home-v3-search b { display: grid; place-items: center; color: #82939b; }
+#home .home-v3-location {
+  display: grid;
+  grid-template-columns: 24px 1fr 18px;
+  align-items: center;
+  width: 100%;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 6px 3px 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  text-align: left;
+}
+#home .home-v3-location svg { width: 19px; height: 19px; }
+#home .home-v3-location small,
+#home .home-v3-location strong { display: block; }
+#home .home-v3-location small { margin-bottom: 2px; color: #bcd0d9; font-size: 8px; }
+#home .home-v3-location strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+#home .home-v3-location b { color: #bcd0d9; }
+#home .home-v3-section { margin-top: 22px; }
+#home .home-v3-title { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+#home .home-v3-title h2 { margin: 0; color: #173746; font-size: 14px; }
+#home .home-v3-vehicles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+#home .home-v3-vehicles button,
+#home .home-v3-vehicles button:nth-child(n) {
+  display: grid;
+  grid-template-columns: 26px auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid #d8e1e5;
+  border-radius: 13px;
+  outline: 0;
+  background: white;
+  color: #536b77;
+  box-shadow: none;
+}
+#home .home-v3-vehicles button.on {
+  border-color: #07384d;
+  outline: 0;
+  background: #07384d;
+  color: white;
+  box-shadow: none;
+}
+#home .home-v3-vehicles button span { display: grid; place-items: center; margin: 0; font-size: 0; }
+#home .home-v3-vehicles button svg { width: 24px; height: 24px; }
+#home .home-v3-vehicles button strong { font-size: 11px; }
+#home .home-v3-services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+#home .home-v3-services button {
+  display: flex;
+  min-height: 112px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 13px 11px;
+  border: 1px solid #d8e1e5;
+  border-radius: 15px;
+  background: white;
+  color: #173746;
+  text-align: left;
+}
+#home .home-v3-services button > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 13px;
+  border-radius: 9px;
+  background: #e8eff2;
+  color: #07384d;
+}
+#home .home-v3-services svg { width: 20px; height: 20px; }
+#home .home-v3-services strong,
+#home .home-v3-services small { display: block; }
+#home .home-v3-services strong { margin-bottom: 4px; font-size: 11px; line-height: 1.25; }
+#home .home-v3-services small { color: #7b8c95; font-size: 8px; line-height: 1.35; }
+#home .home-v3-evening {
+  display: grid;
+  grid-template-columns: 36px 1fr 18px;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px;
+  border: 1px solid #d8e1e5;
+  border-radius: 15px;
+  background: white;
+  color: #173746;
+  text-align: left;
+}
+#home .home-v3-evening > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e8eff2;
+  color: #07384d;
+}
+#home .home-v3-evening svg { width: 20px; height: 20px; }
+#home .home-v3-evening strong,
+#home .home-v3-evening small { display: block; }
+#home .home-v3-evening strong { margin-bottom: 3px; font-size: 11px; }
+#home .home-v3-evening small { color: #7b8c95; font-size: 8px; line-height: 1.4; }
+#home .home-v3-evening b { color: #8a9aa2; }
+#home .home-v3-search:active,
+#home .home-v3-services button:active,
+#home .home-v3-evening:active { opacity: .8; }
+
+html[data-theme="dark"] #home .home-v3 { background: #101820; }
+html[data-theme="dark"] #home .home-v3-brand strong,
+html[data-theme="dark"] #home .home-v3-title h2 { color: #e5edf5; }
+html[data-theme="dark"] #home .home-v3-header .theme-toggle { border-color: #344757; background: #192633; color: #dce7ef; }
+html[data-theme="dark"] #home .home-hero { background: #153b4d; box-shadow: none; }
+html[data-theme="dark"] #home .home-v3-search { background: #f3f6f8; color: #173746; }
+html[data-theme="dark"] #home .home-v3-vehicles button:nth-child(n),
+html[data-theme="dark"] #home .home-v3-services button,
+html[data-theme="dark"] #home .home-v3-evening { border-color: #304253; background: #192633; color: #e5edf5; }
+html[data-theme="dark"] #home .home-v3-vehicles button.on { border-color: #5a91ae; background: #315f75; color: white; }
+html[data-theme="dark"] #home .home-v3-services button > span,
+html[data-theme="dark"] #home .home-v3-evening > span:first-child { background: #233846; color: #b9d7ef; }
+html[data-theme="dark"] #home .home-v3-services small,
+html[data-theme="dark"] #home .home-v3-evening small { color: #9fb1bf; }
+
 /* Map: clearer layers and warmer controls without competing with the map. */
 #find .parking-toolbar {
   padding-bottom: 12px;
