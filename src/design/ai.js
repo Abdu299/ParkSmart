@@ -307,7 +307,6 @@
     if (history.length > 12) history.splice(0, history.length - 12);
     window.removeAiPhoto();
     setBusy(false);
-    input()?.focus({ preventScroll: true });
   }
 
   function receiveAiError(packet) {
@@ -331,7 +330,12 @@
     const attachedImage = imageDataUrl;
     addMessage('user', finalQuestion, { imageDataUrl: attachedImage });
     history.push({ role: 'user', text: finalQuestion.slice(0, 500) });
-    if (input()) input().value = '';
+    if (input()) {
+      input().value = '';
+      input().blur();
+    }
+    hideAiPhotoPreview();
+    setKeyboardLayout(false);
     if (needsLocation(finalQuestion) && !appPerson) {
       pendingLocationQuestion = finalQuestion;
       addMessage('assistant', 'Jeg trenger posisjonen din for å finne nærmeste plass. Godkjenn posisjon, så fortsetter jeg automatisk.');
@@ -354,12 +358,16 @@
     }
   };
 
-  window.removeAiPhoto = () => {
-    imageDataUrl = null;
+  function hideAiPhotoPreview() {
     const preview = document.getElementById('aiPhoto');
     const image = document.getElementById('aiPhotoImage');
     if (preview) preview.hidden = true;
     if (image) image.removeAttribute('src');
+  }
+
+  window.removeAiPhoto = () => {
+    imageDataUrl = null;
+    hideAiPhotoPreview();
   };
 
   function receiveAiPhoto(packet) {
@@ -369,7 +377,6 @@
     if (image) image.src = packet.dataUrl;
     if (preview) preview.hidden = false;
     if (input() && !input().value) input().value = 'Hva betyr dette parkeringsskiltet?';
-    input()?.focus({ preventScroll: true });
   }
 
   window.analyzeSignPhotoWithAi = dataUrl => {
