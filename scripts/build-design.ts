@@ -10,6 +10,7 @@ html = html.replace(parking[0], '<script>const PARKING_DATA='+JSON.stringify(des
 html = html.replace("const DATA_DATE='03.11.2026';", "const DATA_DATE="+JSON.stringify(dataset.fetchedAt.slice(0,10))+';');
 html = html.replace(/<section id="profile"[\s\S]*?<\/section>/, authPage()+favoritesPage());
 html = html.replace(/<section id="ai"[\s\S]*?<\/section>/, aiPage());
+html = html.replace(/<section id="home"[\s\S]*?<\/section>/, homePage());
 // Keep one shared navigation bar as a sibling of every screen.
 html = html.replace(/<div class="nav" data-nav="[^"]+"><\/div>/g, '');
 const phoneEnd = /(<\/section>\s*)<\/div>(?=<script>)/;
@@ -121,6 +122,36 @@ await mkdir('src/design',{recursive:true});
 await writeFile('src/design/document.json',JSON.stringify({html}));
 await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
+function homePage() {
+ return `<section id="home" class="screen active">
+  <div class="scroll home-v2">
+   <header class="home-header row spread">
+    <div class="home-brand"><div class="logo">P</div><div><strong>ParkSmart</strong><small>Parkering i Oslo</small></div></div>
+    <button class="pill" type="button" aria-label="Tema"></button>
+   </header>
+   <button class="home-location" type="button" onclick="requestHomeLocation()">
+    <span class="home-location-icon">${homeIcon('location')}</span><span><small>DIN POSISJON</small><strong id="homearea">Gi tilgang til posisjon</strong></span><span class="home-chevron">${homeIcon('chevron')}</span>
+   </button>
+   <button class="home-search" type="button" onclick="go('find');document.getElementById('findq').focus()">
+    <span>${homeIcon('search')}</span><strong>Hvor vil du parkere?</strong><span class="home-search-action">${homeIcon('arrow')}</span>
+   </button>
+   <div class="home-section-heading"><span>Velg kjøretøy</span></div>
+   <div class="vehicle home-vehicles" role="group" aria-label="Velg kjøretøy">
+    <button class="on" onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('car')}</span><strong>Bil</strong></button>
+    <button onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('motorcycle')}</span><strong>MC</strong></button>
+    <button onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('bicycle')}</span><strong>Sykkel</strong></button>
+   </div>
+   <div class="home-section-heading"><span>Snarveier</span></div>
+   <div class="home-actions">
+    <button class="home-action" onclick="go('ai')"><span class="home-action-icon">${homeIcon('searchParking')}</span><span><strong>Finn parkering</strong><small>Søk etter et sted</small></span><b>${homeIcon('chevron')}</b></button>
+    <button class="home-action" onclick="go('scan')"><span class="home-action-icon">${homeIcon('camera')}</span><span><strong>Skann skilt</strong><small>Få skiltet forklart</small></span><b>${homeIcon('chevron')}</b></button>
+    <button class="home-action" onclick="go('map')"><span class="home-action-icon">${homeIcon('map')}</span><span><strong>Parkeringskart</strong><small>Se plasser i nærheten</small></span><b>${homeIcon('chevron')}</b></button>
+    <button class="home-action" onclick="go('guide')"><span class="home-action-icon">${homeIcon('guide')}</span><span><strong>Skiltguide</strong><small>Regler og betydning</small></span><b>${homeIcon('chevron')}</b></button>
+   </div>
+   <button class="home-evening" type="button" onclick="openFilter('Etter 20')"><span>${homeIcon('clock')}</span><span><strong>Parkering i kveld</strong><small>Finn steder med avgiftsfri tid etter kl. 20</small></span><b>${homeIcon('arrow')}</b></button>
+  </div>
+ </section>`;
+}
 function authPage() {
  return `<section id="profile" class="screen">
   <div class="top"><h2><button class="back" onclick="go('home')" aria-label="Tilbake til hjem">‹</button>Min profil</h2></div>
@@ -248,6 +279,23 @@ function featureIcon(id: 'search'|'camera'|'map'|'guide') {
   camera: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="4"/><path d="M18 9h.01"/>',
   map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2z"/><path d="M9 3v16M15 5v16"/>',
   guide: '<path d="M12 21V5M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-3-1-6-2-10 1z"/>'
+ };
+ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
+}
+function homeIcon(id: string) {
+ const paths: Record<string,string> = {
+  location:'<path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11z"/><circle cx="12" cy="10" r="2"/>',
+  chevron:'<path d="m9 18 6-6-6-6"/>',
+  arrow:'<path d="M5 12h14M14 7l5 5-5 5"/>',
+  search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/>',
+  searchParking:'<circle cx="9.5" cy="9.5" r="5.5"/><path d="m14 14 5 5"/><path d="M7.5 12V7h2a1.6 1.6 0 0 1 0 3.2h-2"/>',
+  car:'<path d="M4 16v-5l2-5h12l2 5v5"/><path d="M3 12h18M6 16v2M18 16v2"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/>',
+  motorcycle:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="m8 16 3-6h3l4 6M10 12H7M13 10l-2-3h3"/>',
+  bicycle:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="m6 16 4-7 3 7 3-5M9 9h5M15 8h2"/>',
+  camera:'<rect x="3" y="6" width="18" height="14" rx="3"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="4"/>',
+  map:'<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
+  guide:'<path d="M12 21V5M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-3-1-6-2-10 1z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
  };
  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
 }
