@@ -52,15 +52,14 @@ html, body {
   transition: transform .15s ease, box-shadow .15s ease;
 }
 #home .feature::after {
-  position: absolute;
-  inset: auto 0 0;
-  height: 4px;
-  content: '';
-  background: #2876d8;
+  display: none;
 }
-#home .feature:nth-child(2)::after { background: #9a5bd1; }
-#home .feature:nth-child(3)::after { background: #0b9a71; }
-#home .feature:nth-child(4)::after { background: #ec8255; }
+#home .feature .symbol {
+  width: 50px;
+  height: 50px;
+  font-size: 29px;
+  border-radius: 13px;
+}
 #home .features + .card {
   border-color: #d6e7ee;
   background: linear-gradient(110deg, #f4faff, #edf8f5);
