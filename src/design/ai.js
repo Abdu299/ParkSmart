@@ -236,36 +236,57 @@
     bubble.appendChild(container);
   }
 
-  function findGuideSign(answer) {
+  function findGuideSign(answer, signCode = '') {
     if (!Array.isArray(SIGN_GUIDE)) return null;
+    if (signCode) {
+      const structured = SIGN_GUIDE.find(sign => sign.code === signCode || sign.id === signCode);
+      if (structured) return structured;
+    }
     const codes = [...String(answer).matchAll(/\b(?:skilt(?:et)?|nummer)\s*(\d{3}(?:\.\d+)*)/gi)].map(match => match[1]);
     for (const code of codes) {
       const exact = SIGN_GUIDE.find(sign => sign.code === code || sign.id === code);
       if (exact) return exact;
     }
     const normalized = String(answer).toLocaleLowerCase('nb-NO');
-    return SIGN_GUIDE.find(sign => sign.title.length >= 5 && normalized.includes(sign.title.toLocaleLowerCase('nb-NO'))) || null;
+    const descriptionCode = /rødt?\s+kryss|to\s+(?:røde?\s+)?skråstreker/.test(normalized)
+      ? '370'
+      : /blå\s+(?:bunn|bakgrunn).*rød\s+ring.*(?:skråstrek|diagonal)|rød\s+ring.*(?:skråstrek|diagonal)/.test(normalized)
+        ? '372'
+        : '';
+    if (descriptionCode) {
+      const described = SIGN_GUIDE.find(sign => sign.code === descriptionCode || sign.id === descriptionCode);
+      if (described) return described;
+    }
+    const compact = normalized.replace(/[^a-zæøå0-9]/g, '');
+    return SIGN_GUIDE.find(sign => {
+      const title = sign.title.toLocaleLowerCase('nb-NO');
+      return title.length >= 5 && (normalized.includes(title) || compact.includes(title.replace(/[^a-zæøå0-9]/g, '')));
+    }) || null;
   }
 
-  function addSignGuideCard(bubble, answer) {
-    const sign = findGuideSign(answer);
-    if (!sign) return;
+  function addSignGuideCard(bubble, answer, signCode) {
+    const sign = findGuideSign(answer, signCode);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'ai-sign-guide-card';
     const image = document.createElement('img');
-    image.src = sign.image;
-    image.alt = sign.title + ', skilt ' + sign.code;
+    if (sign) {
+      image.src = sign.image;
+      image.alt = sign.title + ', skilt ' + sign.code;
+    } else {
+      image.className = 'ai-sign-guide-placeholder';
+      image.alt = '';
+    }
     const text = document.createElement('span');
     const title = document.createElement('strong');
-    title.textContent = sign.title;
+    title.textContent = sign ? sign.title : 'Åpne skiltguiden';
     const detail = document.createElement('small');
-    detail.textContent = 'Skilt ' + sign.code + ' · Se mer i skiltguiden';
+    detail.textContent = sign ? 'Skilt ' + sign.code + ' · Se beskrivelse og regler' : 'Finn skiltet blant alle skiltene';
     text.append(title, detail);
     const arrow = document.createElement('b');
     arrow.textContent = '›';
     button.append(image, text, arrow);
-    button.addEventListener('click', () => openGuideSign(sign.id));
+    button.addEventListener('click', () => sign ? openGuideSign(sign.id) : go('guide'));
     bubble.appendChild(button);
   }
 
@@ -279,7 +300,7 @@
     const answer = typeof packet.answer === 'string' && packet.answer.trim() ? packet.answer.trim() : 'Jeg klarte ikke å lage et svar. Prøv å formulere spørsmålet på nytt.';
     const result = addMessage('assistant', answer);
     const signOnly = signRequests.delete(requestId);
-    if (result && signOnly) addSignGuideCard(result.bubble, answer);
+    if (result && signOnly) addSignGuideCard(result.bubble, answer, packet.signCode);
     if (result && !signOnly) addParkingCards(result.bubble, packet.parkingIds);
     if (!signOnly && Array.isArray(packet.parkingIds) && packet.parkingIds.length) lastParkingIds = packet.parkingIds.slice(0, 3);
     history.push({ role: 'assistant', text: answer.slice(0, 1500) });
