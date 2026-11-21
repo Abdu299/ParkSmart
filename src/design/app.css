@@ -481,6 +481,144 @@ html[data-theme="dark"] .favorite-dialog-card p { color: #abbecd; }
 html[data-theme="dark"] .parking-free-now { border-color: #318764; background: #123c2d; color: #a7eac7; }
 html[data-theme="dark"] .parking-free-now small { color: #93cdb0; }
 #homearea { text-align: left; }
+
+/* Map: clearer layers and warmer controls without competing with the map. */
+#find .parking-toolbar {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d9e8ef;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(23, 105, 210, .12), transparent 36%),
+    linear-gradient(180deg, #f8fcfd, #f2f8fa);
+  box-shadow: 0 5px 18px rgba(7, 56, 77, .08);
+}
+#find .parking-search {
+  border: 1px solid #d6e5ed;
+  background: white;
+  box-shadow: 0 7px 20px rgba(7, 56, 77, .09);
+}
+#find .parking-search .btn {
+  background: linear-gradient(145deg, #2478df, #1259bd);
+  box-shadow: 0 5px 13px rgba(23, 105, 210, .24);
+}
+#find .location-button {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid #b9d7ef;
+  border-radius: 12px;
+  background: #edf6ff;
+  color: #1459a8;
+  font-weight: 750;
+}
+#find .parking-controls select {
+  border-color: #c9dce7;
+  background: white;
+  box-shadow: 0 3px 9px rgba(7, 56, 77, .06);
+}
+#find .parking-filters .pill {
+  border: 1px solid #dbe7ed;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 3px 9px rgba(7, 56, 77, .05);
+}
+#find .parking-filters .pill.on {
+  border-color: #1769d2;
+  background: linear-gradient(145deg, #2478df, #1259bd);
+  color: white;
+  box-shadow: 0 5px 13px rgba(23, 105, 210, .2);
+}
+#find .parking-sheet {
+  border-top: 1px solid #d6e5ed;
+  background: linear-gradient(180deg, #fbfdfe, #f5fafb);
+  box-shadow: 0 -7px 22px rgba(7, 56, 77, .1);
+}
+#find #listToggle {
+  background: linear-gradient(115deg, #edf5ff, #eaf8f4);
+  border-color: #c9ddeb;
+}
+#find .fit-button {
+  background: #edf6ff;
+  color: #1769d2;
+}
+#find .map-legend {
+  border: 1px solid rgba(255,255,255,.42);
+  box-shadow: 0 5px 16px rgba(4, 31, 45, .2);
+  backdrop-filter: blur(8px);
+}
+
+/* Profile: each area has its own gentle identity. */
+#profile .top {
+  background: linear-gradient(120deg, #07384d, #0b6378);
+}
+#profile .auth-page {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(88, 196, 213, .14), transparent 30%),
+    linear-gradient(180deg, #f3f9fb, #ffffff 60%);
+}
+#profile .auth-card {
+  border-color: #d4e4ec;
+  box-shadow: 0 13px 34px rgba(7, 56, 77, .1);
+}
+#profile .auth-brand {
+  background: linear-gradient(145deg, #2478df, #0b7288);
+}
+#profile .profile-account {
+  padding: 12px;
+  border: 1px solid #d7e7ef;
+  border-radius: 16px;
+  background: linear-gradient(115deg, #eff6ff, #eef9f6);
+}
+#profile .profile-section {
+  box-shadow: 0 6px 17px rgba(7, 56, 77, .055);
+}
+#profile .profile-section:nth-of-type(1) {
+  border-color: #eadba4;
+  background: linear-gradient(120deg, #fffaf0, #fffdf8);
+}
+#profile .profile-section:nth-of-type(2) {
+  border-color: #cfe0f1;
+  background: linear-gradient(120deg, #f3f8ff, #f8fbff);
+}
+#profile .profile-section:nth-of-type(3) {
+  border-color: #d2e8e1;
+  background: linear-gradient(120deg, #f1faf7, #f9fcfb);
+}
+#profile .profile-segments button.selected {
+  background: linear-gradient(145deg, #2478df, #1259bd);
+  color: white;
+  box-shadow: 0 4px 12px rgba(23, 105, 210, .2);
+}
+#profile .profile-action > span:first-child {
+  background: #eaf3ff;
+  color: #1769d2;
+}
+#profile .profile-action:nth-of-type(2) > span:first-child {
+  background: #e6f7f1;
+  color: #08745e;
+}
+#profile .profile-action-danger > span:first-child {
+  background: #ffebed;
+  color: #bd3c45;
+}
+
+html[data-theme="dark"] #find .parking-toolbar {
+  border-color: #304253;
+  background: radial-gradient(circle at 100% 0%, rgba(39, 104, 189, .18), transparent 36%), #101820;
+  box-shadow: none;
+}
+html[data-theme="dark"] #find .parking-search,
+html[data-theme="dark"] #find .parking-controls select,
+html[data-theme="dark"] #find .parking-filters .pill { border-color: #3b5062; background: #1b2b38; box-shadow: none; }
+html[data-theme="dark"] #find .location-button { border-color: #385a76; background: #1b3348; color: #a8ccff; }
+html[data-theme="dark"] #find .parking-filters .pill.on { border-color: #6095df; background: #2768bd; color: white; }
+html[data-theme="dark"] #find .parking-sheet { border-color: #304253; background: linear-gradient(180deg, #14212b, #101820); box-shadow: 0 -7px 22px rgba(0,0,0,.2); }
+html[data-theme="dark"] #find #listToggle { background: linear-gradient(115deg, #20364d, #1d3a38); }
+html[data-theme="dark"] #find .fit-button { background: #20364d; color: #b7d5ff; }
+html[data-theme="dark"] #profile .top { background: linear-gradient(120deg, #101f2c, #16455a); }
+html[data-theme="dark"] #profile .auth-page { background: radial-gradient(circle at 100% 0%, rgba(39, 104, 189, .16), transparent 30%), #101820; }
+html[data-theme="dark"] #profile .profile-account { border-color: #355065; background: linear-gradient(115deg, #1d3041, #193632); }
+html[data-theme="dark"] #profile .profile-section:nth-of-type(1) { border-color: #665833; background: #211f19; }
+html[data-theme="dark"] #profile .profile-section:nth-of-type(2) { border-color: #344e6b; background: #172432; }
+html[data-theme="dark"] #profile .profile-section:nth-of-type(3) { border-color: #315449; background: #172824; }
+html[data-theme="dark"] #profile .profile-segments button.selected { background: #2768bd; color: white; }
 @media (max-height: 650px) {
   #find .parking-toolbar { max-height: 42%; }
   #find .parking-sheet:not(.expanded) #filterDescription { display: none; }
