@@ -302,6 +302,6 @@ function homeIcon(id: string) {
  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
 }
 function appNavigation() {
- const tabs = [['home','Hjem'],['map','Kart'],['ai','AI-søk'],['scan','Skann skilt'],['profile','Profil']];
+ const tabs = [['home','Hjem'],['map','Kart'],['scan','Skann skilt'],['ai','AI-søk'],['profile','Profil']];
  return '<nav id="appNavigation" class="app-nav" aria-label="Hovedmeny">'+tabs.map(([id,label])=>`<button type="button" data-tab="${id}" onclick="${id==='scan'?'openScanTab()':`go('${id}')`}"${id==='home'?' class="active" aria-current="page"':''}><span class="ico">${navIcon(id)}</span><span>${label}</span></button>`).join('')+'</nav>';
 }
