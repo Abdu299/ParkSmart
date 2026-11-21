@@ -48,6 +48,8 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes('class="scroll home-v3"'));assert.ok(output.includes('class="home-v3-services"'));
  assert.ok(output.includes('class="vehicle home-v3-vehicles"'));assert.ok(output.includes('Parkering etter kl. 20'));
  assert.ok(!home.includes('🚘'));assert.ok(!home.includes('🏍'));assert.ok(!home.includes('🚲'));
+ assert.ok(!output.includes('🚘 Bil'));assert.ok(!output.includes('🏍 MC'));
+ assert.ok(output.includes('class="profile-vehicle-icon"'));
  assert.ok(!output.includes('<span>🛴</span>Elsparkesykkel'));
  assert.ok(!output.includes('<option>Elsparkesykkel</option>'));
  assert.ok(output.includes("type:'bikeRefresh'"));
