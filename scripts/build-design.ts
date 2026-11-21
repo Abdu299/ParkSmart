@@ -204,8 +204,8 @@ function authPage() {
      <p class="profile-setting-help">Automatisk følger innstillingen på telefonen.</p>
      <p class="profile-setting-label">Standard kjøretøy</p>
      <div class="profile-segments profile-vehicle-choice" role="group" aria-label="Velg standard kjøretøy">
-      <button type="button" data-profile-vehicle="Bil" onclick="setProfileVehicle('Bil')">🚘 Bil</button>
-      <button type="button" data-profile-vehicle="MC" onclick="setProfileVehicle('MC')">🏍 MC</button>
+      <button type="button" data-profile-vehicle="Bil" onclick="setProfileVehicle('Bil')"><span class="profile-vehicle-icon">${homeIcon('car')}</span><strong>Bil</strong></button>
+      <button type="button" data-profile-vehicle="MC" onclick="setProfileVehicle('MC')"><span class="profile-vehicle-icon">${homeIcon('motorcycle')}</span><strong>MC</strong></button>
      </div>
     </section>
     <section class="profile-section" aria-labelledby="accountTitle">
@@ -291,8 +291,8 @@ function homeIcon(id: string) {
   arrow:'<path d="M5 12h14M14 7l5 5-5 5"/>',
   search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/>',
   searchParking:'<circle cx="9.5" cy="9.5" r="5.5"/><path d="m14 14 5 5"/><path d="M7.5 12V7h2a1.6 1.6 0 0 1 0 3.2h-2"/>',
-  car:'<path d="M4 16v-5l2-5h12l2 5v5"/><path d="M3 12h18M6 16v2M18 16v2"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/>',
-  motorcycle:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="m8 16 3-6h3l4 6M10 12H7M13 10l-2-3h3"/>',
+  car:'<path d="M5 17v-5l2-6h10l2 6v5"/><path d="M6 11h12M5 13.5h14M7 17v2M17 17v2"/><circle cx="8" cy="15.3" r=".9" fill="currentColor" stroke="none"/><circle cx="16" cy="15.3" r=".9" fill="currentColor" stroke="none"/>',
+  motorcycle:'<circle cx="6" cy="16.5" r="3"/><circle cx="18" cy="16.5" r="3"/><path d="m8.5 16.5 3-6h3l3.5 6M11.5 10.5 9.5 8H7M14.5 10.5 17 8h2M11 16.5h4"/>',
   bicycle:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="m6 16 4-7 3 7 3-5M9 9h5M15 8h2"/>',
   camera:'<rect x="3" y="6" width="18" height="14" rx="3"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="4"/>',
   map:'<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
