@@ -17,6 +17,7 @@ if (!phoneEnd.test(html)) throw new Error('Missing end of app shell');
 html = html.replace(phoneEnd, '$1'+appNavigation()+'</div>');
 html = html.replace('<section id="welcome" class="screen active">', '<section id="welcome" class="screen">');
 html = html.replace('<section id="home" class="screen">', '<section id="home" class="screen active">');
+html = html.replaceAll('<span style="margin-left:auto">🎙</span>', '');
 // Bicycle is a real mode backed by Oslo Bysykkel. The scooter placeholder is
 // intentionally removed until ParkSmart has a reliable scooter data source.
 html = html.replace('<button onclick="vehicle(this)"><span>🛴</span>Elsparkesykkel</button>', '');
