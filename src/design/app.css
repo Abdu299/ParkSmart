@@ -371,6 +371,21 @@ html[data-theme="dark"] #home .features + .card { background: #192b35; border-co
 .profile-segments button { min-width: 0; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 9px; background: transparent; color: #607789; font-size: 11px; font-weight: 800; }
 .profile-segments button.selected { background: white; color: #0759d8; box-shadow: 0 2px 8px rgba(4, 59, 82, .12); }
 .profile-vehicle-choice { grid-template-columns: 1fr 1fr; }
+.profile-vehicle-choice button {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+.profile-vehicle-choice .profile-vehicle-icon { display: grid; place-items: center; }
+.profile-vehicle-choice .profile-vehicle-icon svg { width: 27px; height: 27px; }
+.profile-vehicle-choice button strong { font-size: 13px; }
+.profile-vehicle-choice button.selected {
+  background: #07384d;
+  color: white;
+  box-shadow: none;
+}
 .profile-action { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; width: 100%; gap: 10px; padding: 12px 2px; border: 0; border-top: 1px solid #e1e9ef; border-bottom: 1px solid #e1e9ef; background: transparent; color: #183346; text-align: left; }
 .profile-action > span:first-child { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: #eaf2ff; color: #0759d8; font-size: 17px; }
 .profile-action strong, .profile-action small { display: block; }
@@ -411,6 +426,7 @@ html[data-theme="dark"] .profile-setting-label { color: #dbe6ef; }
 html[data-theme="dark"] .profile-segments { background: #0f1820; }
 html[data-theme="dark"] .profile-segments button { color: #abbecd; }
 html[data-theme="dark"] .profile-segments button.selected { background: #263e57; color: #a8ccff; box-shadow: none; }
+html[data-theme="dark"] .profile-vehicle-choice button.selected { background: #315f75; color: white; }
 html[data-theme="dark"] .profile-action { border-color: #304253; color: #e5edf5; }
 html[data-theme="dark"] .profile-action > span:first-child { background: #233c5b; color: #a8ccff; }
 html[data-theme="dark"] .profile-action em { background: #26333e; color: #abbecd; }
@@ -1039,6 +1055,8 @@ html[data-theme="dark"] #profile .profile-section:nth-of-type(1) { border-color:
 html[data-theme="dark"] #profile .profile-section:nth-of-type(2) { border-color: #344e6b; background: #172432; }
 html[data-theme="dark"] #profile .profile-section:nth-of-type(3) { border-color: #315449; background: #172824; }
 html[data-theme="dark"] #profile .profile-segments button.selected { background: #2768bd; color: white; }
+#profile .profile-vehicle-choice button.selected { background: #07384d; color: white; box-shadow: none; }
+html[data-theme="dark"] #profile .profile-vehicle-choice button.selected { background: #315f75; color: white; }
 @media (max-height: 650px) {
   #find .parking-toolbar { max-height: 42%; }
   #find .parking-sheet:not(.expanded) #filterDescription { display: none; }
