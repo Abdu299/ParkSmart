@@ -108,10 +108,10 @@ export function useDesignBridge(send: (packet: unknown) => void) {
             parking:Array.isArray(packet.parking)?packet.parking.slice(0,8):[]
           })
         });
-        const result=await response.json() as {answer?:unknown;parkingIds?:unknown;error?:unknown};
+        const result=await response.json() as {answer?:unknown;parkingIds?:unknown;signCode?:unknown;error?:unknown};
         if(!response.ok)throw new Error(typeof result.error==='string'?result.error:'AI-tjenesten svarte med en feil.');
         if(typeof result.answer!=='string')throw new Error('AI-tjenesten ga et ugyldig svar.');
-        send({type:'aiResult',requestId,answer:result.answer,parkingIds:Array.isArray(result.parkingIds)?result.parkingIds.filter((id):id is string=>typeof id==='string').slice(0,3):[]});
+        send({type:'aiResult',requestId,answer:result.answer,parkingIds:Array.isArray(result.parkingIds)?result.parkingIds.filter((id):id is string=>typeof id==='string').slice(0,3):[],signCode:typeof result.signCode==='string'?result.signCode:''});
       }catch(error){
         const raw=error instanceof Error?error.message:'';
         const timedOut=error instanceof Error&&(error.name==='AbortError'||/cancel|abort|timed?\s*out/i.test(raw));
