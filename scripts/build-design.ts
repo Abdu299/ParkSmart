@@ -54,7 +54,6 @@ html = html.replace(
 );
 const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
-html = html.replace('onclick="useSignPhoto()">Analyser skiltet</button>', 'onclick="useSignPhoto()">Godkjenn og analyser</button>');
 const bridge = await readFile('src/design/bridge.js','utf8');
 const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
