@@ -45,8 +45,8 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(!output.includes('<span style="margin-left:auto">🎙</span>'));
  assert.ok(!output.includes('<span class="symbol">🔎</span>'));
  assert.ok(!output.includes('<div class="photo" style="height:55px;width:75px"></div>'));
- assert.ok(output.includes('class="scroll home-v2"'));assert.ok(output.includes('class="home-actions"'));
- assert.ok(output.includes('class="vehicle-icon"'));assert.ok(output.includes('Parkering i kveld'));
+ assert.ok(output.includes('class="scroll home-v3"'));assert.ok(output.includes('class="home-v3-services"'));
+ assert.ok(output.includes('class="vehicle home-v3-vehicles"'));assert.ok(output.includes('Parkering etter kl. 20'));
  assert.ok(!home.includes('🚘'));assert.ok(!home.includes('🏍'));assert.ok(!home.includes('🚲'));
  assert.ok(!output.includes('<span>🛴</span>Elsparkesykkel'));
  assert.ok(!output.includes('<option>Elsparkesykkel</option>'));
