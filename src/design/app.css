@@ -70,10 +70,14 @@ html, body {
 #home .feature-icon-map { background: #e4f8f1; color: #08745e; }
 #home .feature-icon-guide { background: #fff0e9; color: #ca6440; }
 #home .features + .card {
+  min-height: 78px;
+  padding: 16px 17px;
   border-color: #d6e7ee;
   background: linear-gradient(110deg, #f4faff, #edf8f5);
   box-shadow: 0 7px 20px rgba(7, 56, 77, .07);
 }
+#home .features + .card > div { flex: 1; }
+#home .features + .card strong { font-size: 15px !important; }
 html[data-theme="dark"] #home .scroll {
   background:
     radial-gradient(circle at 100% 0%, rgba(41, 123, 153, .18), transparent 30%),
