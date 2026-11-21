@@ -152,6 +152,10 @@
   object-fit: contain;
 }
 
+.ai-sign-guide-placeholder {
+  background: #e8f1f7;
+}
+
 .ai-sign-guide-card span {
   display: flex;
   min-width: 0;
