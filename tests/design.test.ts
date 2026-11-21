@@ -8,6 +8,7 @@ test('All original sign images, text, sources and 298 signs are preserved byte f
  assert.equal(signs(output),signs(source));const data=JSON.parse(signs(output)!.slice('const SIGN_GUIDE='.length).replace(/;\s*$/,''));assert.equal(data.length,298);
 });
 test('Every original page is retained with profile login and a working AI chat shell',()=>{
+ const home=output.match(/<section id="home"[\s\S]*?<\/section>/)?.[0]||'';
  for(const id of [...source.matchAll(/<section id="([^"]+)"/g)].map(m=>m[1]))assert.ok(output.includes(`<section id="${id}"`),id);
  assert.ok(output.includes('Spør om parkering …'));assert.ok(output.includes('submitAiQuestion(event)'));assert.ok(output.includes('ai-keyboard-open'));assert.ok(output.includes('visualViewport'));assert.ok(output.includes('Logg inn for å lagre favoritter og parkeringsvalg.'));
  assert.ok(output.includes('requestHomeLocation()'));assert.ok(!output.includes('<span id="homearea">Oslo sentrum</span>'));
@@ -41,12 +42,12 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes("['Grønland', 59.9127, 10.7600"));
  assert.ok(output.includes('requestedArea(question)'));assert.ok(output.includes('area?.center || appPerson'));
  assert.ok(output.includes("' til ' + area.name"));
- assert.ok(output.includes('<span>🚲</span>Sykkel'));
  assert.ok(!output.includes('<span style="margin-left:auto">🎙</span>'));
- assert.ok(output.includes('feature-icon-search'));assert.ok(output.includes('feature-icon-camera'));
- assert.ok(output.includes('feature-icon-map'));assert.ok(output.includes('feature-icon-guide'));
  assert.ok(!output.includes('<span class="symbol">🔎</span>'));
  assert.ok(!output.includes('<div class="photo" style="height:55px;width:75px"></div>'));
+ assert.ok(output.includes('class="scroll home-v2"'));assert.ok(output.includes('class="home-actions"'));
+ assert.ok(output.includes('class="vehicle-icon"'));assert.ok(output.includes('Parkering i kveld'));
+ assert.ok(!home.includes('🚘'));assert.ok(!home.includes('🏍'));assert.ok(!home.includes('🚲'));
  assert.ok(!output.includes('<span>🛴</span>Elsparkesykkel'));
  assert.ok(!output.includes('<option>Elsparkesykkel</option>'));
  assert.ok(output.includes("type:'bikeRefresh'"));
