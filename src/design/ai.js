@@ -1,4 +1,4 @@
-/* global PARKING_DATA, appOpenDetails, appPerson, nativeSend, requestHomeLocation */
+/* global PARKING_DATA, appOpenDetails, appPerson, nativeSend, requestHomeLocation, go */
 /* ParkSmart AI presentation layer. The native host owns networking and secrets. */
 (() => {
   let imageDataUrl = null;
@@ -303,6 +303,14 @@
     if (input() && !input().value) input().value = 'Hva betyr dette parkeringsskiltet?';
     input()?.focus({ preventScroll: true });
   }
+
+  window.analyzeSignPhotoWithAi = dataUrl => {
+    if (busy || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return;
+    receiveAiPhoto({ dataUrl });
+    go('ai');
+    if (input()) input().value = 'Forklar dette parkeringsskiltet. Les hovedskilt, underskilt, klokkeslett og eventuelle unntak.';
+    setTimeout(() => window.submitAiQuestion(), 80);
+  };
 
   const receiveBeforeAi = window.ParkSmartNative.receive;
   window.ParkSmartNative.receive = packet => {
