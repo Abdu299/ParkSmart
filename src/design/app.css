@@ -31,6 +31,26 @@ html, body {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
+#home .vehicle { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bike-availability {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin: 10px 0 12px;
+}
+.bike-availability > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 11px;
+  border: 1px solid #bfe8df;
+  border-radius: 12px;
+  background: #e8f8f4;
+  color: #075f54;
+}
+.bike-availability strong { font-size: 19px; }
+.bike-availability small { font-size: 10px; font-weight: 750; }
+.bike-live-note { color: #547487; font-size: 11px; }
 /* Consistent headers with full-size back buttons and room for every title. */
 .top, .parking-top {
   position: relative;
