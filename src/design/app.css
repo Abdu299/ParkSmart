@@ -498,6 +498,222 @@ html[data-theme="dark"] .parking-free-now { border-color: #318764; background: #
 html[data-theme="dark"] .parking-free-now small { color: #93cdb0; }
 #homearea { text-align: left; }
 
+/* Home v2: restrained utility style with one accent color and no emoji. */
+#home .home-v2 {
+  padding: 24px 20px 30px;
+  background: #f6f8f9;
+}
+#home .home-header { margin-bottom: 22px; }
+#home .home-brand { display: flex; align-items: center; gap: 11px; }
+#home .home-brand .logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: #07384d;
+  box-shadow: none;
+  font-size: 28px;
+}
+#home .home-brand strong,
+#home .home-brand small { display: block; }
+#home .home-brand strong { color: #132f3e; font-size: 20px; line-height: 1.15; letter-spacing: -.25px; }
+#home .home-brand small { margin-top: 3px; color: #71838d; font-size: 10px; font-weight: 650; }
+#home .theme-toggle {
+  border: 1px solid #d9e2e7;
+  background: white;
+  color: #344f5e;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 750;
+}
+#home .home-location {
+  display: grid;
+  grid-template-columns: 38px 1fr 20px;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: #173746;
+  text-align: left;
+}
+#home .home-location-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e5eef2;
+  color: #07384d;
+}
+#home .home-location svg { width: 20px; height: 20px; }
+#home .home-location small,
+#home .home-location strong { display: block; }
+#home .home-location small { margin-bottom: 3px; color: #7a8c95; font-size: 8px; font-weight: 850; letter-spacing: 1px; }
+#home .home-location strong { font-size: 13px; }
+#home .home-chevron { color: #8a9aa2; }
+#home .home-search {
+  display: grid;
+  grid-template-columns: 24px 1fr 36px;
+  align-items: center;
+  width: 100%;
+  min-height: 62px;
+  gap: 11px;
+  margin: 10px 0 24px;
+  padding: 9px 10px 9px 17px;
+  border: 1px solid #07384d;
+  border-radius: 16px;
+  background: #07384d;
+  color: white;
+  text-align: left;
+  box-shadow: 0 8px 18px rgba(7, 56, 77, .15);
+}
+#home .home-search > span:first-child svg { width: 22px; height: 22px; }
+#home .home-search strong { font-size: 15px; font-weight: 700; }
+#home .home-search-action {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.12);
+}
+#home .home-search-action svg { width: 18px; height: 18px; }
+#home .home-section-heading {
+  margin: 0 2px 10px;
+  color: #647984;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+#home .home-vehicles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 4px;
+  border: 1px solid #dce4e8;
+  border-radius: 15px;
+  background: #e9eef1;
+}
+#home .home-vehicles button,
+#home .home-vehicles button:nth-child(n) {
+  display: flex;
+  min-height: 74px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 4px;
+  border: 0;
+  border-radius: 11px;
+  outline: 0;
+  background: transparent;
+  color: #536b77;
+  box-shadow: none;
+}
+#home .home-vehicles button.on {
+  border: 0;
+  outline: 0;
+  background: white;
+  color: #07384d;
+  box-shadow: 0 3px 10px rgba(7, 56, 77, .1);
+}
+#home .home-vehicles .vehicle-icon { display: grid; place-items: center; margin: 0; font-size: 0; }
+#home .home-vehicles .vehicle-icon svg { width: 27px; height: 27px; }
+#home .home-vehicles strong { font-size: 11px; }
+#home .home-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+#home .home-action {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  grid-template-rows: 1fr auto;
+  min-height: 124px;
+  gap: 12px 10px;
+  padding: 15px;
+  border: 1px solid #dce4e8;
+  border-radius: 15px;
+  background: white;
+  color: #173746;
+  text-align: left;
+  box-shadow: none;
+}
+#home .home-action-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #e7eff3;
+  color: #07384d;
+}
+#home .home-action-icon svg { width: 22px; height: 22px; }
+#home .home-action > span:nth-child(2) { grid-column: 1 / -1; }
+#home .home-action strong,
+#home .home-action small { display: block; }
+#home .home-action strong { margin-bottom: 5px; font-size: 13px; }
+#home .home-action small { color: #71838d; font-size: 10px; line-height: 1.4; }
+#home .home-action > b {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+#home .home-action:active,
+#home .home-evening:active,
+#home .home-search:active { transform: scale(.985); }
+#home .home-evening {
+  display: grid;
+  grid-template-columns: 40px 1fr 20px;
+  align-items: center;
+  width: 100%;
+  gap: 11px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #dce4e8;
+  border-radius: 15px;
+  background: white;
+  color: #173746;
+  text-align: left;
+}
+#home .home-evening > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #07384d;
+  color: white;
+}
+#home .home-evening svg { width: 21px; height: 21px; }
+#home .home-evening strong,
+#home .home-evening small { display: block; }
+#home .home-evening strong { margin-bottom: 4px; font-size: 13px; }
+#home .home-evening small { color: #71838d; font-size: 10px; line-height: 1.4; }
+#home .home-evening > b { color: #8a9aa2; }
+
+html[data-theme="dark"] #home .home-v2 { background: #101820; }
+html[data-theme="dark"] #home .home-brand strong { color: #e5edf5; }
+html[data-theme="dark"] #home .home-brand small,
+html[data-theme="dark"] #home .home-action small,
+html[data-theme="dark"] #home .home-evening small { color: #9fb1bf; }
+html[data-theme="dark"] #home .theme-toggle { border-color: #344757; background: #192633; color: #dce7ef; }
+html[data-theme="dark"] #home .home-location { color: #e5edf5; }
+html[data-theme="dark"] #home .home-location-icon { background: #1d3040; color: #b9d7ef; }
+html[data-theme="dark"] #home .home-search { border-color: #315f75; background: #16475b; box-shadow: none; }
+html[data-theme="dark"] #home .home-vehicles { border-color: #304253; background: #14212b; }
+html[data-theme="dark"] #home .home-vehicles button:nth-child(n) { background: transparent; color: #9fb1bf; }
+html[data-theme="dark"] #home .home-vehicles button.on { background: #223441; color: #eff7fb; box-shadow: none; }
+html[data-theme="dark"] #home .home-action,
+html[data-theme="dark"] #home .home-evening { border-color: #304253; background: #192633; color: #e5edf5; }
+html[data-theme="dark"] #home .home-action-icon { background: #233846; color: #b9d7ef; }
+html[data-theme="dark"] #home .home-evening > span:first-child { background: #315f75; }
+
 /* Map: clearer layers and warmer controls without competing with the map. */
 #find .parking-toolbar {
   padding-bottom: 12px;
