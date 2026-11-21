@@ -54,6 +54,7 @@ html = html.replace(
 );
 const css = '<style>'+await readFile('src/design/app.css','utf8')+'\n'+await readFile('src/design/ai.css','utf8')+'</style>';
 html = html.replace('Bildet sendes til OpenAI for analyse. API-bruk kan koste penger.', 'Bildet blir på enheten i denne versjonen. Automatisk analyse er ikke tilkoblet.');
+html = html.replace('onclick="useSignPhoto()">Analyser skiltet</button>', 'onclick="useSignPhoto()">Godkjenn og analyser</button>');
 const bridge = await readFile('src/design/bridge.js','utf8');
 const search = await readFile('src/design/search.js','utf8');
 const mapControls = await readFile('src/design/map-controls.js','utf8');
@@ -67,8 +68,10 @@ function syncAppNavigation() {
   const screen = document.querySelector('.screen.active')?.id || 'home';
   const tab = ['find', 'map', 'details', 'payment'].includes(screen)
     ? 'map'
-    : ['scan', 'signPreview', 'signResult', 'recognized', 'guideDetail'].includes(screen)
-      ? 'guide'
+    : ['scan', 'signPreview', 'signResult', 'recognized'].includes(screen)
+      ? 'scan'
+      : ['guide', 'guideDetail'].includes(screen)
+        ? 'home'
       : screen === 'favorites' ? 'profile' : screen;
   document.querySelectorAll('#appNavigation [data-tab]').forEach(button => {
     const active = button.dataset.tab === tab;
@@ -223,12 +226,13 @@ function navIcon(id: string) {
   home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
   map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
   ai: '<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5zM20 2v4M18 4h4"/>',
+  scan: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="m8 6 1.5-2h5L16 6"/><circle cx="12" cy="13" r="4"/><path d="M18 9h.01"/>',
   guide: '<path d="M12 21V5M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-3-1-6-2-10 1z"/>',
   profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
  };
  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[id]}</svg>`;
 }
 function appNavigation() {
- const tabs = [['home','Hjem'],['map','Kart'],['ai','AI-søk'],['guide','Skilt'],['profile','Profil']];
- return '<nav id="appNavigation" class="app-nav" aria-label="Hovedmeny">'+tabs.map(([id,label])=>`<button type="button" data-tab="${id}" onclick="go('${id}')"${id==='home'?' class="active" aria-current="page"':''}><span class="ico">${navIcon(id)}</span><span>${label}</span></button>`).join('')+'</nav>';
+ const tabs = [['home','Hjem'],['map','Kart'],['ai','AI-søk'],['scan','Skann skilt'],['profile','Profil']];
+ return '<nav id="appNavigation" class="app-nav" aria-label="Hovedmeny">'+tabs.map(([id,label])=>`<button type="button" data-tab="${id}" onclick="${id==='scan'?'openScanTab()':`go('${id}')`}"${id==='home'?' class="active" aria-current="page"':''}><span class="ico">${navIcon(id)}</span><span>${label}</span></button>`).join('')+'</nav>';
 }
