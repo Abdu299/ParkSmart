@@ -43,6 +43,9 @@ test('Every original page is retained with profile login and a working AI chat s
  assert.ok(output.includes("' til ' + area.name"));
  assert.ok(output.includes('<span>🚲</span>Sykkel'));
  assert.ok(!output.includes('<span style="margin-left:auto">🎙</span>'));
+ assert.ok(output.includes('feature-icon-search'));assert.ok(output.includes('feature-icon-camera'));
+ assert.ok(output.includes('feature-icon-map'));assert.ok(output.includes('feature-icon-guide'));
+ assert.ok(!output.includes('<span class="symbol">🔎</span>'));
  assert.ok(!output.includes('<span>🛴</span>Elsparkesykkel'));
  assert.ok(!output.includes('<option>Elsparkesykkel</option>'));
  assert.ok(output.includes("type:'bikeRefresh'"));
