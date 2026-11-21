@@ -310,7 +310,11 @@ findPlace = async function () {
 function refreshAppData() {
   const status = document.getElementById('addressStatus');
   status.hidden = false;
-  status.textContent = 'Henter oppdaterte data …';
+  status.textContent = selectedVehicle === 'Sykkel' ? 'Oppdaterer sykler og ledige låser …' : 'Henter oppdaterte data …';
+  if (selectedVehicle === 'Sykkel') {
+    requestBikeStations(true);
+    return;
+  }
   if (!nativeSend({
     type: 'refresh'
   })) status.textContent = 'Oppdater uttrekket med npm run data:quick og npm run design:build.';
