@@ -4,11 +4,13 @@
   const system = window.matchMedia('(prefers-color-scheme: dark)');
   let saved;
   try { saved = window.localStorage.getItem(key); } catch {}
-  let dark = saved === 'dark' || (saved !== 'light' && system.matches);
+  let mode = ['light', 'dark', 'system'].includes(saved) ? saved : 'system';
+  let dark = mode === 'dark' || (mode === 'system' && system.matches);
   const buttons = [];
   const style = document.createElement('style');
   style.textContent = `
-    .theme-toggle { min-height: 36px; white-space: nowrap; }
+    .theme-toggle { display:inline-flex;align-items:center;gap:7px;min-height:38px;white-space:nowrap; }
+    .theme-toggle svg { width:17px;height:17px; }
     #profile .theme-toggle { margin-top: 20px; }
     html[data-theme="dark"] { color-scheme: dark; --navy: #101f2c; --ink: #e5edf5; --blue: #8bb9ff; --pale: #192b3b; --line: #304253; --green: #6ad9a5; }
     html[data-theme="dark"] body,
@@ -55,25 +57,39 @@
   document.head.appendChild(style);
 
   function apply() {
+    dark = mode === 'dark' || (mode === 'system' && system.matches);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.documentElement.dataset.themeMode = mode;
     buttons.forEach(button => {
-      button.textContent = dark ? '☀ Lys modus' : '☾ Mørk modus';
+      const icon = dark
+        ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
+        : '<path d="M20 15.5A8 8 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5z"/>';
+      button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + icon + '</svg><span>' + (dark ? 'Lys' : 'Mørk') + '</span>';
       button.setAttribute('aria-label', dark ? 'Bytt til lys modus' : 'Bytt til mørk modus');
+    });
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+      const selected = button.dataset.themeChoice === mode;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
     });
     const packet = { type: 'theme', theme: dark ? 'dark' : 'light' };
     if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(packet));
     else if (window.parent !== window) window.parent.postMessage({ channel: 'parksmart:request', payload: packet }, '*');
   }
 
+  window.setParkSmartTheme = next => {
+    if (!['light', 'dark', 'system'].includes(next)) return;
+    mode = next;
+    try { window.localStorage.setItem(key, mode); } catch {}
+    apply();
+  };
+
   function button() {
     const element = document.createElement('button');
     element.type = 'button';
     element.className = 'pill theme-toggle';
     element.addEventListener('click', () => {
-      dark = !dark;
-      saved = dark ? 'dark' : 'light';
-      try { window.localStorage.setItem(key, saved); } catch {}
-      apply();
+      window.setParkSmartTheme(dark ? 'light' : 'dark');
     });
     buttons.push(element);
     return element;
@@ -84,9 +100,6 @@
     if (notification) notification.replaceWith(button());
     else homeHeader.appendChild(button());
   }
-  document.querySelector('#profile .login-required')?.appendChild(button());
-  system.addEventListener('change', event => {
-    if (saved !== 'dark' && saved !== 'light') { dark = event.matches; apply(); }
-  });
+  system.addEventListener('change', () => { if (mode === 'system') apply(); });
   apply();
 })();
