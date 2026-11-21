@@ -124,31 +124,33 @@ await writeFile('assets/design/parksmart.html',html);
 console.log('Built matching design:',html.length,'characters; signs preserved; parking records',dataset.locations.length);
 function homePage() {
  return `<section id="home" class="screen active">
-  <div class="scroll home-v2">
-   <header class="home-header row spread">
-    <div class="home-brand"><div class="logo">P</div><div><strong>ParkSmart</strong><small>Parkering i Oslo</small></div></div>
+  <div class="scroll home-v3">
+   <header class="home-v3-header row spread">
+    <div class="home-v3-brand"><div class="logo">P</div><strong>ParkSmart</strong></div>
     <button class="pill" type="button" aria-label="Tema"></button>
    </header>
-   <button class="home-location" type="button" onclick="requestHomeLocation()">
-    <span class="home-location-icon">${homeIcon('location')}</span><span><small>DIN POSISJON</small><strong id="homearea">Gi tilgang til posisjon</strong></span><span class="home-chevron">${homeIcon('chevron')}</span>
-   </button>
-   <button class="home-search" type="button" onclick="go('find');document.getElementById('findq').focus()">
-    <span>${homeIcon('search')}</span><strong>Hvor vil du parkere?</strong><span class="home-search-action">${homeIcon('arrow')}</span>
-   </button>
-   <div class="home-section-heading"><span>Velg kjøretøy</span></div>
-   <div class="vehicle home-vehicles" role="group" aria-label="Velg kjøretøy">
-    <button class="on" onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('car')}</span><strong>Bil</strong></button>
-    <button onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('motorcycle')}</span><strong>MC</strong></button>
-    <button onclick="vehicle(this)"><span class="vehicle-icon">${homeIcon('bicycle')}</span><strong>Sykkel</strong></button>
-   </div>
-   <div class="home-section-heading"><span>Snarveier</span></div>
-   <div class="home-actions">
-    <button class="home-action" onclick="go('ai')"><span class="home-action-icon">${homeIcon('searchParking')}</span><span><strong>Finn parkering</strong><small>Søk etter et sted</small></span><b>${homeIcon('chevron')}</b></button>
-    <button class="home-action" onclick="go('scan')"><span class="home-action-icon">${homeIcon('camera')}</span><span><strong>Skann skilt</strong><small>Få skiltet forklart</small></span><b>${homeIcon('chevron')}</b></button>
-    <button class="home-action" onclick="go('map')"><span class="home-action-icon">${homeIcon('map')}</span><span><strong>Parkeringskart</strong><small>Se plasser i nærheten</small></span><b>${homeIcon('chevron')}</b></button>
-    <button class="home-action" onclick="go('guide')"><span class="home-action-icon">${homeIcon('guide')}</span><span><strong>Skiltguide</strong><small>Regler og betydning</small></span><b>${homeIcon('chevron')}</b></button>
-   </div>
-   <button class="home-evening" type="button" onclick="openFilter('Etter 20')"><span>${homeIcon('clock')}</span><span><strong>Parkering i kveld</strong><small>Finn steder med avgiftsfri tid etter kl. 20</small></span><b>${homeIcon('arrow')}</b></button>
+   <section class="home-hero" aria-labelledby="homeHeroTitle">
+    <div class="home-hero-copy"><small>PARKERING I OSLO</small><h1 id="homeHeroTitle">Finn en plass</h1><p>Søk etter gate, område eller parkeringsanlegg.</p></div>
+    <button class="home-v3-search" type="button" onclick="go('find');setTimeout(()=>document.getElementById('findq').focus(),80)"><span>${homeIcon('search')}</span><span>Hvor vil du parkere?</span><b>${homeIcon('arrow')}</b></button>
+    <button class="home-v3-location" type="button" onclick="requestHomeLocation()"><span>${homeIcon('location')}</span><span><small>Nåværende posisjon</small><strong id="homearea">Gi tilgang til posisjon</strong></span><b>${homeIcon('chevron')}</b></button>
+   </section>
+   <section class="home-v3-section" aria-labelledby="vehicleTitle">
+    <div class="home-v3-title"><h2 id="vehicleTitle">Kjøretøy</h2></div>
+    <div class="vehicle home-v3-vehicles" role="group" aria-label="Velg kjøretøy">
+     <button class="on" onclick="vehicle(this)"><span>${homeIcon('car')}</span><strong>Bil</strong></button>
+     <button onclick="vehicle(this)"><span>${homeIcon('motorcycle')}</span><strong>MC</strong></button>
+     <button onclick="vehicle(this)"><span>${homeIcon('bicycle')}</span><strong>Sykkel</strong></button>
+    </div>
+   </section>
+   <section class="home-v3-section" aria-labelledby="servicesTitle">
+    <div class="home-v3-title"><h2 id="servicesTitle">Tjenester</h2></div>
+    <div class="home-v3-services">
+     <button onclick="go('map')"><span>${homeIcon('map')}</span><strong>Kart</strong><small>Se alle plasser</small></button>
+     <button onclick="openScanTab()"><span>${homeIcon('camera')}</span><strong>Skann skilt</strong><small>Forstå reglene</small></button>
+     <button onclick="go('guide')"><span>${homeIcon('guide')}</span><strong>Skiltguide</strong><small>Se alle skilt</small></button>
+    </div>
+   </section>
+   <button class="home-v3-evening" type="button" onclick="openFilter('Etter 20')"><span>${homeIcon('clock')}</span><span><strong>Parkering etter kl. 20</strong><small>Se steder med avgiftsfri tid i kveld</small></span><b>${homeIcon('chevron')}</b></button>
   </div>
  </section>`;
 }
